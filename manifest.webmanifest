@@ -1,7 +1,7 @@
 {
   "name": "MR Hausservice",
   "short_name": "MR Service",
-  "description": "MR Hausservice V1.9.5 – sichere Backups, Arbeitszeitauswertung und Bedienkomfort",
+  "description": "MR Hausservice V1.9.5.1 – sichere Backups, Arbeitszeitauswertung und Bedienkomfort",
   "start_url": "./index.html?v=195",
   "scope": "./",
   "display": "standalone",
