@@ -1,7 +1,7 @@
 {
   "name": "MR Hausservice",
   "short_name": "MR Service",
-  "description": "Private Projekt-, Lager- und Finanzübersicht",
+  "description": "Private Projekt-, Lager-, Finanz- und Backup-Übersicht",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
