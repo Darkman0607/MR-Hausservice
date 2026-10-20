@@ -1,7 +1,7 @@
 {
   "name": "MR Hausservice",
   "short_name": "MR Service",
-  "description": "MR Hausservice V1.9.5.3 – Auftragsfotos und Galerie",
+  "description": "MR Hausservice V1.9.5.4 – Auftragsfotos und Galerie",
   "start_url": "./index.html?v=1953",
   "scope": "./",
   "display": "standalone",
