@@ -4,3 +4,8 @@
 
 .l2-photo-overlay{position:fixed;inset:0;z-index:9997;background:#050b0ef2;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:15px;gap:15px}.l2-photo-overlay img{max-width:96%;max-height:80vh;object-fit:contain}.l2-photo-overlay button{background:#14795a;color:white;border-radius:12px;border:0;padding:12px 20px}
 #lager2-root .l2-alert-toggle{display:flex;align-items:center;gap:10px;padding:10px 0;font-size:14px}#lager2-root .l2-alert-toggle input{width:20px;height:20px;accent-color:#24aa7c;flex-shrink:0}
+
+/* V1.9.7.3: klickbare Übersichtskennzahlen */
+#lager2-root button.l2-stat-button{width:100%;color:inherit;text-align:left;cursor:pointer;font:inherit;min-height:94px;touch-action:manipulation}
+#lager2-root button.l2-stat-button:focus-visible{outline:3px solid #75f4b5;outline-offset:2px}
+#lager2-root button.l2-stat-button:active{transform:scale(.985)}

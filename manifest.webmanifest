@@ -1,7 +1,7 @@
 {
   "name": "MR Hausservice",
   "short_name": "MR Service",
-  "description": "MR-Hausservice V1.9.7.2 – Aufträge, Medien, Google Drive und Berichte",
+  "description": "MR-Hausservice V1.9.7.3 – Aufträge, Medien, Google Drive und Berichte",
   "start_url": "./index.html?v=1972",
   "scope": "./",
   "display": "standalone",
