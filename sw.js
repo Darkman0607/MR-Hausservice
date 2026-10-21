@@ -1,4 +1,4 @@
-const CACHE='mr-hausservice-v1-9-7-4';
+const CACHE='mr-hausservice-v1-9-7-5';
 const ASSETS=['./','./index.html','./work1964.css','./lager2.css','./js/lager2.js','./js/auftrag_layout1964.js','./manifest.webmanifest','./icon-192.png','./icon-512.png','./js/auftrag_typ1962.js','./js/auftrag_layout1963.js','./js/core.js','./js/verwaltung.js','./js/auftraege_medien.js','./js/backup_google.js','./js/kalender.js','./js/updates.js','./js/oberflaeche.js','./js/verbesserungen1961.js'];
 self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(CACHE);await c.addAll(['./','./index.html']);await Promise.all(ASSETS.filter(a=>a!=='./'&&a!=='./index.html').map(async a=>{try{const r=await fetch(a,{cache:'reload'});if(r.ok)await c.put(a,r)}catch(err){}}));await self.skipWaiting()})()));
 self.addEventListener('activate',e=>e.waitUntil((async()=>{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('mr-hausservice-')&&k!==CACHE).map(k=>caches.delete(k)));await self.clients.claim()})()));
