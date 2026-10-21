@@ -1,5 +1,1 @@
-MR-Hausservice V1.9.5.1 – Notfallkorrektur
-Ursache: loadSettings() zeichnete die Schnellzugriffe vor der Initialisierung der const-Konfiguration. Dabei wurde das gesamte JavaScript durch einen ReferenceError unterbrochen.
-Fix: Vorzeitigen Aufruf entfernt; initiales Zeichnen erfolgt am Ende der Initialisierung.
-Datenspeicher und Datenbanknamen unverändert.
-INSTALLATION: Bestehende App NICHT löschen; kein Browserdaten-Reset. Dateien entpacken und GitHub-Dateien ersetzen, dann GitHub Pages Veröffentlichung abwarten.
+HOTFIX V1.9.7.1: Header-Version aktualisiert, Service-Worker-Cache erneuert, bestehende work1964.css im Paket. Lade ALLE Dateien aus der ZIP in das Root deines GitHub-Repositories hoch (Ordnerstruktur beibehalten), nicht die ZIP selbst. Vorher Daten sichern. Danach GitHub Pages Veröffentlichung abwarten und App neu laden. Die lokalen Daten werden von diesen Dateien nicht absichtlich geloescht.
