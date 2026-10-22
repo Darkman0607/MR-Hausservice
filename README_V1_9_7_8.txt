@@ -1,0 +1,1 @@
+V1.9.7.8: Startseite nach Vorschlag 5. Schnellzugriffe entfernt, Dashboard mit Live-Zahlen und Lagerstatus ergänzt. Alle bestehenden Lager- und Backup-Funktionen bleiben unverändert. Vor Upload Datensicherung erstellen.
