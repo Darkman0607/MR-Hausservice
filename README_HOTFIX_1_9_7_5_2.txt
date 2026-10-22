@@ -1,0 +1,1 @@
+MR-Hausservice V1.9.7.5.2 – Artikel löschen.\nLöschen in Kachel-, Listen- und Detailansicht; Sicherheitsabfrage; Rückgängig während laufender App-Sitzung. Vor Upload Gesamtsicherung anlegen.\n
