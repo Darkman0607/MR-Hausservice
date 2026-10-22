@@ -31,3 +31,12 @@
 .l2-stats-three .l2-stat{min-width:0;padding:12px 7px}
 .l2-stats-three .l2-stat span{font-size:clamp(10px,2.7vw,14px);overflow-wrap:anywhere}
 @media(max-width:360px){.l2-stats-three .l2-stat b{font-size:23px}}
+
+/* V1.9.7.6: dedicated, beta-only Zuhause collection */
+#lager2-root .l2-tabs{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+#lager2-root .l2-tabs .l2-tab{min-width:0;font-size:clamp(10px,2.65vw,12px);padding:8px 2px;overflow-wrap:normal;white-space:nowrap}
+#lager2-root .l2-home-note{padding:12px 13px;border:1px solid #3d836d;border-radius:13px;color:#caf2dd;background:linear-gradient(140deg,#193e35,#102723);font-size:12px;line-height:1.5;margin:0 0 13px}
+#lager2-root .l2-home-intro{margin-bottom:14px;padding:15px;background:linear-gradient(140deg,#224c42,#15312c);border:1px solid #48a080;border-radius:16px;display:grid;gap:7px}
+#lager2-root .l2-home-intro strong{font-size:17px;color:#f5fffa}
+#lager2-root .l2-home-intro span{font-size:12px;color:#c2e7d6;line-height:1.45}
+#lager2-root .l2-home-intro .l2-btn{margin-top:5px;min-height:44px;text-align:center;background:#167857}

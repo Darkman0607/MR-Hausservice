@@ -1,0 +1,48 @@
+/* MR-Hausservice V1.9.7.6: premium three-dimensional five-tab navigation. */
+body.premium-v192 .nav.nav1976{
+ background:linear-gradient(165deg,rgba(25,47,56,.98),rgba(6,17,26,.99))!important;
+ border:1px solid rgba(98,145,156,.35)!important;
+ box-shadow:0 -14px 28px rgba(0,0,0,.55),inset 0 2px 0 rgba(210,255,253,.12)!important;
+ gap:3px!important;padding:9px 6px calc(10px + env(safe-area-inset-bottom))!important;
+ isolation:isolate;
+}
+body.premium-v192 .nav.nav1976 button{
+ position:relative;isolation:isolate;border:1px solid transparent!important;
+ color:#b7cad2!important;background:transparent!important;
+ border-radius:18px!important;min-height:88px!important;padding:5px 2px 7px!important;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px!important;
+ font-weight:600;letter-spacing:.08px;transition:color .18s,background .18s,box-shadow .18s,transform .18s;
+}
+body.premium-v192 .nav.nav1976 button i{
+ --tile-from:#24a666;--tile-to:#07583d;--tile-glow:rgba(27,222,140,.62);
+ position:relative;isolation:isolate;display:grid!important;place-items:center;
+ width:clamp(45px,12vw,68px)!important;height:clamp(45px,12vw,68px)!important;
+ border:1px solid rgba(255,255,255,.35)!important;border-radius:17px!important;
+ background:linear-gradient(164deg,rgba(255,255,255,.22),transparent 40%),linear-gradient(160deg,var(--tile-from),var(--tile-to))!important;
+ box-shadow:inset 0 3px 3px rgba(255,255,255,.50),inset 0 -6px 8px rgba(0,0,0,.35),0 7px 0 rgba(0,0,0,.24),0 10px 15px rgba(0,0,0,.38)!important;
+ transform:translateY(0);transition:transform .2s,filter .2s,box-shadow .2s;
+}
+body.premium-v192 .nav.nav1976 button:nth-child(2) i{--tile-from:#719cff;--tile-to:#3444a6;--tile-glow:rgba(98,126,255,.65)}
+body.premium-v192 .nav.nav1976 button:nth-child(3) i{--tile-from:#ffca68;--tile-to:#b65e06;--tile-glow:rgba(255,169,60,.7)}
+body.premium-v192 .nav.nav1976 button:nth-child(4) i{--tile-from:#86ebf0;--tile-to:#077485;--tile-glow:rgba(88,214,233,.65)}
+body.premium-v192 .nav.nav1976 button:nth-child(5) i{--tile-from:#ffe58a;--tile-to:#a9770a;--tile-glow:rgba(244,190,72,.65)}
+body.premium-v192 .nav.nav1976 button i::before{content:"";position:absolute;inset:3px 5px auto; height:30%;border-radius:12px 12px 55% 55%;background:linear-gradient(to bottom,rgba(255,255,255,.33),rgba(255,255,255,0));pointer-events:none;z-index:-1}
+body.premium-v192 .nav.nav1976 button i svg{width:53%;height:53%;color:white;filter:drop-shadow(0 2px 1px rgba(0,0,0,.35));stroke-width:2.35}
+body.premium-v192 .nav.nav1976 button span{font-size:clamp(10px,2.8vw,13px);white-space:nowrap;z-index:1}
+body.premium-v192 .nav.nav1976 button.active{
+ background:linear-gradient(150deg,rgba(25,112,91,.33),rgba(5,30,42,.62))!important;
+ border-color:rgba(79,237,187,.8)!important;
+ color:#fff!important;box-shadow:inset 0 1px 0 rgba(150,255,217,.24),0 0 0 1px rgba(17,193,141,.20),0 0 24px rgba(0,232,145,.21)!important;
+}
+body.premium-v192 .nav.nav1976 button.active::after{
+ content:"";position:absolute;bottom:0;left:25%;right:25%;height:3px;border-radius:6px 6px 0 0;
+ background:#6fffc5;box-shadow:0 0 13px 3px rgba(72,255,190,.7);
+}
+body.premium-v192 .nav.nav1976 button.active i{
+ transform:translateY(-3px) scale(1.045)!important;filter:brightness(1.12) saturate(1.14);
+ box-shadow:inset 0 3px 3px rgba(255,255,255,.65),inset 0 -5px 8px rgba(0,0,0,.33),0 7px 0 rgba(0,0,0,.24),0 0 0 2px rgba(157,255,220,.65),0 0 20px 4px var(--tile-glow)!important;
+}
+body.premium-v192 .nav.nav1976 button:focus-visible{outline:2px solid #8cffd6!important;outline-offset:-2px}
+body.premium-v192 .nav.nav1976 button:active i{transform:translateY(1px) scale(.97)!important}
+@media(max-width:390px){body.premium-v192 .nav.nav1976{gap:0!important;padding-inline:2px!important}body.premium-v192 .nav.nav1976 button{min-height:76px!important;padding-inline:1px!important}body.premium-v192 .nav.nav1976 button i{width:clamp(43px,12vw,50px)!important;height:clamp(43px,12vw,50px)!important;border-radius:14px!important}}
+@media(prefers-reduced-motion:reduce){body.premium-v192 .nav.nav1976 button,body.premium-v192 .nav.nav1976 button i{transition:none}}
