@@ -40,3 +40,5 @@
 #lager2-root .l2-home-intro strong{font-size:17px;color:#f5fffa}
 #lager2-root .l2-home-intro span{font-size:12px;color:#c2e7d6;line-height:1.45}
 #lager2-root .l2-home-intro .l2-btn{margin-top:5px;min-height:44px;text-align:center;background:#167857}
+
+.l2-shared-option{display:flex!important;align-items:center;gap:12px;padding:14px;border:1px solid #2eb98e;border-radius:14px;background:#123a33;margin:14px 0 6px;font-weight:700}.l2-shared-option input{width:23px!important;height:23px!important;accent-color:#17ce94;flex-shrink:0}
