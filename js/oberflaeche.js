@@ -18,12 +18,12 @@ function premiumQuickSelection(){const raw=Array.isArray(settings.quick195)?sett
 function premiumRenderQuick(){const el=$('#premium-quick-grid');if(!el)return;el.innerHTML=premiumQuickSelection().map(id=>{const x=PREMIUM_QUICK_ITEMS.find(q=>q.id===id);return `<button type="button" class="quick" data-premium-quick="${x.id}" aria-label="${esc(x.label)}"><strong>${x.symbol}</strong>${esc(x.label)}<small>${esc(x.sub)}</small></button>`}).join('')}
 function premiumConfigOpen(){const chosen=premiumQuickSelection();$('#premium-config-list').innerHTML=PREMIUM_QUICK_ITEMS.map(x=>`<label class="premium-config-option"><input type="checkbox" value="${x.id}" ${chosen.includes(x.id)?'checked':''}><span>${x.symbol} ${esc(x.label)}</span></label>`).join('');$('#premium-config-modal').classList.add('show');$('#premium-config-modal').setAttribute('aria-hidden','false')}
 function premiumConfigClose(){$('#premium-config-modal').classList.remove('show');$('#premium-config-modal').setAttribute('aria-hidden','true')}
-$('#premium-config-open').addEventListener('click',premiumConfigOpen);
-$('#premium-config-close').addEventListener('click',premiumConfigClose);
-$('#premium-config-modal').addEventListener('click',e=>{if(e.target.id==='premium-config-modal')premiumConfigClose()});
-$('#premium-config-reset').addEventListener('click',()=>{$$('#premium-config-list input').forEach(el=>el.checked=PREMIUM_DEFAULT.includes(el.value))});
-$('#premium-config-save').addEventListener('click',()=>{const ids=$$('#premium-config-list input:checked').map(el=>el.value);if(ids.length!==4){alert('Bitte genau vier Schnellzugriffe auswählen.');return}settings.quick195=ids;try{saveSettings();premiumRenderQuick();premiumConfigClose();flash193('✓ Schnellzugriffe gespeichert')}catch(e){alert('Auswahl konnte nicht gespeichert werden: '+e.message)}});
-$('#premium-quick-grid').addEventListener('click',e=>{const b=e.target.closest('[data-premium-quick]');if(!b)return;const x=PREMIUM_QUICK_ITEMS.find(q=>q.id===b.dataset.premiumQuick);if(!x)return;if(x.mode==='open')openForm(x.id);else if(x.mode==='calendar'){const cal=$('[data-calendar-open]');if(cal)cal.click();else goto('calendar')}else goto(x.target||x.id)});
+$('#premium-config-open')?.addEventListener('click',premiumConfigOpen);
+$('#premium-config-close')?.addEventListener('click',premiumConfigClose);
+$('#premium-config-modal')?.addEventListener('click',e=>{if(e.target.id==='premium-config-modal')premiumConfigClose()});
+$('#premium-config-reset')?.addEventListener('click',()=>{$$('#premium-config-list input').forEach(el=>el.checked=PREMIUM_DEFAULT.includes(el.value))});
+$('#premium-config-save')?.addEventListener('click',()=>{const ids=$$('#premium-config-list input:checked').map(el=>el.value);if(ids.length!==4){alert('Bitte genau vier Schnellzugriffe auswählen.');return}settings.quick195=ids;try{saveSettings();premiumRenderQuick();premiumConfigClose();flash193('✓ Schnellzugriffe gespeichert')}catch(e){alert('Auswahl konnte nicht gespeichert werden: '+e.message)}});
+$('#premium-quick-grid')?.addEventListener('click',e=>{const b=e.target.closest('[data-premium-quick]');if(!b)return;const x=PREMIUM_QUICK_ITEMS.find(q=>q.id===b.dataset.premiumQuick);if(!x)return;if(x.mode==='open')openForm(x.id);else if(x.mode==='calendar'){const cal=$('[data-calendar-open]');if(cal)cal.click();else goto('calendar')}else goto(x.target||x.id)});
 // Zurück aus Unterseiten: vorherige Hauptseite statt stets Start. Keine Browser-History-Manipulation.
 const premiumBackStack=[];
 const premiumOriginalGoto=goto;
