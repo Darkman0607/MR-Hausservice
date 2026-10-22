@@ -1,7 +1,7 @@
 {
   "name": "MR Hausservice",
   "short_name": "MR Service",
-  "description": "MR-Hausservice V1.9.7.6 – 3D-Premium-Navigation und Zuhause-Lager (Beta)",
+  "description": "MR-Hausservice V1.9.7.7 – 3D-Premium-Navigation und Zuhause-Lager (Beta)",
   "start_url": "./index.html?v=1976",
   "scope": "./",
   "display": "standalone",

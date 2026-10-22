@@ -1,0 +1,1 @@
+MR-Hausservice 1.9.7.7 – Lagerlayout Vorschlag 2. Zwei Hauptbereiche Arbeit und Zuhause, Unterfilter Arbeit/Privat/Alle, Kategorie-Kacheln und neueste Artikel. Vor dem Einspielen Gesamtsicherung anlegen.
