@@ -2,7 +2,7 @@
    Do not import commercial objects automatically; old backup and PDF paths stay intact. */
 (function(){
 'use strict';
-const VERSION='1.9.8.2';
+const VERSION='1.9.8.3';
 const types=['Objekt','Stockwerk / Bereich','Raum','Zone','Schrank','Lagerplatz'];
 const tabs=[['overview','Übersicht'],['places','Objekte & Räume'],['tasks','Putzpläne'],['clean','Reinigung'],['supplies','Material'],['devices','Geräte'],['reports','Statistik']];
 let tab='overview',editor=null,mode='business',booted=false;
@@ -46,30 +46,35 @@ const prevGoto=goto;
 goto=function(page){if(!page.startsWith('mrp-')){if(mode!=='business'){mode='business';document.body.dataset.mrpMode='business';document.querySelectorAll('[data-mrp-switch]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mrpSwitch==='business')))}prevGoto(page);return}goPrivate(page)};
 const originalRender=render;
 render=function(){originalRender();refresh()};
-function privateHome(){const h=state(),tasks=dueTasks();
- const tiles=[
-  ['cycle','Zyklus','Deinen Zyklus im Blick','calendar'],
-  ['drop','Periode','Einträge & Symptome','diary'],
-  ['flower','Ausfluss','Beobachten & verstehen','diary'],
-  ['bolt','Schmerzen','Veränderungen festhalten','diary'],
-  ['baby','Schwangerschaft','Planung & Begleitung','diary'],
-  ['group','Gemeinsame Selbstkontrolle','Beobachtungen dokumentieren','selfcheck'],
-  ['book','Lernzentrum','Wissen, das weiterhilft','learn'],
-  ['calendar','Termine','Arzttermine & Erinnerungen','calendar']
+function privateHome(){const h=state(),tasks=dueTasks(),suppliesLow=h.supplies.filter(s=>n(s.qty)<=n(s.min)).length,appointments=(Array.isArray(db.appointments)?db.appointments:[]).filter(a=>a.category==='Privat').length;
+ const modules=[
+  {cls:'household',title:'Haushalt & Putzen',desc:'Räume, Pläne, Reinigung, Geräte',extra:`${h.places.length} Bereiche · ${tasks.length} fällig`,attrs:'data-mrp-action="open-household"'},
+  {cls:'fridge',title:'Kühlschrank & Vorräte',desc:'Lebensmittel, Haltbarkeit, Lager',extra:'Planung vorbereitet',attrs:'data-mrp-action="planned"'},
+  {cls:'shopping',title:'Einkaufen & Essen',desc:'Listen, Rezepte, Essensplanung',extra:'Planung vorbereitet',attrs:'data-mrp-action="planned"'},
+  {cls:'finance',title:'Privatfinanzen',desc:'Ausgaben, Budget, Sparziele',extra:'Planung vorbereitet',attrs:'data-mrp-action="planned"'},
+  {cls:'school',title:'Familie & Schule',desc:'Stundenplan, Hausaufgaben, Lernen',extra:'Planung vorbereitet',attrs:'data-mrp-action="planned"'},
+  {cls:'reminder',title:'Termine & Erinnerungen',desc:'Kalender, Aufgaben, Geburtstage',extra:`${appointments} private Termine`,attrs:'data-mrp-go="mrp-today"'},
+  {cls:'vehicle',title:'Fahrzeuge',desc:'Wartung, Kosten, Termine',extra:'Planung vorbereitet',attrs:'data-mrp-action="planned"'},
+  {cls:'docs',title:'Dokumente & Verträge',desc:'Dateien, Verträge, Übersichten',extra:'Planung vorbereitet',attrs:'data-mrp-action="planned"'},
+  {cls:'project',title:'Private Projekte',desc:'Ideen, Pläne, To-dos',extra:'Planung vorbereitet',attrs:'data-mrp-action="planned"'},
+  {cls:'notes',title:'Notizen & Sonstiges',desc:'Notizen, Listen, Aufzeichnungen',extra:`${suppliesLow} Warnung(en)`,attrs:'data-mrp-action="planned"'}
  ];
- return `<div class="v2-private-landing">
- <div class="v2-welcome"><h1>Hallo! <span class="v2-heart-symbol">♥</span></h1><p>Deine Gesundheit. Dein Leben. In einer App.</p></div>
- <button type="button" class="v2-photo-hero v2-photo-private" data-mrw-open="calendar" aria-label="Zykluskalender öffnen"><span class="v2-hero-copy"><strong>Zyklus im Blick</strong><small>Verstehe deinen Körper<br>besser – jeden Tag.</small></span><span class="v2-circle-arrow">➜</span></button>
- <div class="v2-feature-grid">${tiles.map(([icon,title,desc,target],i)=>`<button type="button" class="v2-feature-card ${['pink','pink','pink','pink','pink','emerald','pink','emerald'][i]}" data-mrw-open="${target}"><img src="v2_assets/${icon}.svg" alt=""/><strong>${title}</strong><small>${desc}</small></button>`).join('')}</div>
- <div class="v2-private-utility"><button type="button" data-mrp-go="mrp-import"><img src="v2_assets/cloud.svg" alt=""/><span>Daten übernehmen <small>Sicherungsdatei aus der bisherigen Frauen-App</small></span><b>›</b></button><button type="button" data-mrp-action="open-household"><img src="v2_assets/home.svg" alt=""/><span>Haushalt & Putzen <small>${tasks.length} Aufgaben aktuell fällig</small></span><b>›</b></button><button type="button" data-mrp-switch="today"><img src="v2_assets/calendar.svg" alt=""/><span>Gemeinsame Tagesübersicht <small>Termine & Planungen</small></span><b>›</b></button><button type="button" data-mrw-open="records"><img src="v2_assets/cloud.svg" alt=""/><span>Gesundheitsdaten & Backup <small>Verschlüsselt in der Frauen-App</small></span><b>›</b></button></div>
+ return `<div class="mrf-home">
+ <div class="mrf-mode-strip">
+  <button type="button" class="mrf-mode-card" data-mrp-switch="business"><span class="mrf-mode-icon"><img src="v2_assets/briefcase.svg" alt=""/></span><span><b>Hausservice</b><small>Business</small></span></button>
+  <button type="button" class="mrf-mode-card active"><span class="mrf-mode-icon"><img src="v2_assets/group.svg" alt=""/></span><span><b>Familie & Privat</b><small>Aktiv</small></span></button>
+  <button type="button" class="mrf-mode-card mrf-mode-health" data-mrp-go="mrp-women"><span class="mrf-mode-icon"><img src="icons3d/ui-heart.svg" alt=""/></span><span><b>Gesundheit</b><small>Frauen-App</small></span></button>
+ </div>
+ <div class="mrf-welcome"><h1>Hallo! <span>♥</span></h1><p>Dein Zuhause. Deine Familie. Dein Alltag. In einer App.</p></div>
+ <div class="mrf-module-grid">${modules.map(m=>`<button type="button" class="mrf-module mrf-${m.cls}" ${m.attrs}><span class="mrf-module-art" aria-hidden="true"></span><strong>${m.title}</strong><small>${m.desc}</small><em>${m.extra}</em><i>›</i></button>`).join('')}</div>
  </div>`;
 }
 function sharedToday(){const ts=dateNow(),h=state();const appts=(Array.isArray(db.appointments)?db.appointments:[]).filter(a=>a.date===ts&&a.status!=='Abgesagt');const works=(Array.isArray(db.work)?db.work:[]).filter(w=>w.date===ts&&w.status!=='Erledigt');const dueList=dueTasks(),maintenance=maintenanceDue();const todayEntries=[...appts.map(a=>({title:a.title||'Termin',tag:a.category==='Privat'?'Privater Termin':'Termin',time:a.start||'–'})),...works.map(w=>({title:w.title||'Arbeit',tag:'Arbeit',time:'–'}))].sort((a,b)=>a.time.localeCompare(b.time));
- const header=`<div class="mrp-hero"><small>GEMEINSAME TAGESZENTRALE</small><h1>${new Date().toLocaleDateString('de-AT',{weekday:'long',day:'numeric',month:'long'})}</h1><small>Gewerbe und Privat auf einen Blick. Finanzdaten bleiben getrennt.</small></div>`;
+ const header=`<div class="mrp-hero"><small>FAMILIE & PRIVAT · KALENDER</small><h1>${new Date().toLocaleDateString('de-AT',{weekday:'long',day:'numeric',month:'long'})}</h1><small>Gewerbe und Privat auf einen Blick. Finanzdaten bleiben getrennt.</small></div>`;
  return header+`<div class="mrp-cards"><div class="mrp-stat"><b>${appts.length}</b><small>Termine heute</small></div><div class="mrp-stat"><b>${works.length}</b><small>Arbeiten heute</small></div><div class="mrp-stat"><b>${dueList.length}</b><small>Putzaufgaben fällig</small></div><div class="mrp-stat"><b>${maintenance.length}</b><small>Geräte-Wartung fällig</small></div></div>`+
  `<div class="mrp-panel"><div class="mrp-section-head"><h2>🗓 Termine & Arbeiten</h2>${button('business-calendar','Kalender öffnen')}</div>${todayEntries.length?todayEntries.map(e=>`<div class="mrp-row"><div class="mrp-row-main"><b>${safe(e.title)}</b><small>${safe(e.tag)}</small></div><span class="mrp-pill">${safe(e.time)}</span></div>`).join(''):hint('Heute keine bestehenden Termine oder datierten Arbeiten.')}</div>`+
  `<div class="mrp-panel"><div class="mrp-section-head"><h2>🧽 Anstehende Reinigungen</h2>${button('open-household','Haushalt öffnen')}</div>${dueList.length?dueList.slice(0,6).map(t=>`<div class="mrp-row"><div class="mrp-row-main"><b>${safe(t.title)}</b><small>${safe(pathName(t.placeId))}</small></div><span class="mrp-pill due">${safe(formatDate(due(t)))}</span></div>`).join(''):hint('Keine fälligen privaten Reinigungsaufgaben.')}</div><div class="mrp-panel"><h2>🔧 Fällige Gerätewartungen</h2>${maintenance.length?maintenance.map(d=>`<div class="mrp-row"><div class="mrp-row-main"><b>${safe(d.title)}</b><small>${safe(pathName(d.placeId))}</small></div></div>`).join(''):hint('Keine fällige Gerätewartung.')}</div>`+
- `<div class="mrp-notice">Diese Tagesübersicht zeigt bisher vorhandene Kalendereinträge sowie die neuen Haushaltsaufgaben. Ein späterer privater Familienkalender ist noch nicht umgesetzt.</div>`;
+ `<div class="mrp-notice">Diese Übersicht bündelt deine privaten Termine, Haushaltsaufgaben und fällige Wartungen. Weitere Familienmodule werden in späteren Updates ergänzt.</div>`;
 }
 function householdShell(){return `<div class="mrp-hero"><small>MR PRIVAT</small><h1>🧹 Haushalt & Putzen</h1><small>Räume · Reinigungen · Materialien · Geräte · Auswertungen</small></div>
 <div class="mrp-tabs" role="tablist">${tabs.map(([key,t])=>`<button type="button" data-mrp-tab="${key}" class="${tab===key?'active':''}" aria-selected="${tab===key}">${safe(t)}</button>`).join('')}</div><div class="mrp-tab-panel">${({overview,places:placesPanel,tasks:tasksPanel,clean:cleanPanel,supplies:suppliesPanel,devices:devicesPanel,reports:reportsPanel})[tab]()}</div>`}
@@ -141,7 +146,7 @@ async function completeSession(){const h=state(),s=h.active;if(!s)return;const p
 function detailsSession(objid){const s=find('sessions',objid);if(!s)return;const w=document.createElement('div');w.className='mrp-layer';w.innerHTML=`<div class="mrp-modal" role="dialog" aria-modal="true"><div class="mrp-modal-header"><h2>Reinigungsbericht</h2><button class="mrp-btn" data-detail-close="1">✕</button></div><p>Datum: ${safe(new Date(s.finishedAt).toLocaleString('de-AT'))} · Dauer: ${duration(s.durationMs)}</p><h3>Räume & Zeiten</h3>${(s.roomIds||[]).map(pid=>`<div class="mrp-row"><b>${safe(pathName(pid))}</b><span>${duration(s.roomMs?.[pid]||0)}</span></div>`).join('')}<h3>Checkliste</h3>${(s.completedTaskIds||[]).map(tid=>`<div class="mrp-row"><span>${safe(state().tasks.find(t=>t.id===tid)?.title||'Gelöschte Aufgabe')}</span>✓</div>`).join('')||'–'}<h3>Verbrauch · ${money(s.materialCost)}</h3>${(s.materials||[]).map(m=>`<div class="mrp-row">${safe(m.title)}: ${n(m.qty)} ${safe(state().supplies.find(x=>x.id===m.id)?.unit||'')}</div>`).join('')||'–'}<p>${safe(s.note||'')}</p><h3>Vorher</h3>${photoThumbs(s.beforePhotos)}<h3>Nachher</h3>${photoThumbs(s.afterPhotos)}</div>`;document.body.appendChild(w);w.addEventListener('click',e=>{if(e.target===w||e.target.closest('[data-detail-close]'))w.remove()});}
 async function action(name,objid){const h=state();switch(name){
  case 'export-csv':exportCsv();return;
- case 'planned':alert('Dieser Bereich ist als nächstes Ausbau-Modul geplant. Heute wird Haushalt & Putzen umgesetzt.');return;
+ case 'planned':alert('Dieser Bereich ist in der Familienzentrale bereits eingeplant. In diesem Update sind zuerst Familienstartseite, Frauen-Gesundheit ohne Passwort sowie Haushalt & Putzen vollständig umgesetzt.');return;
  case 'open-household':tab='overview';goPrivate('mrp-household');return;
  case 'business-calendar':chooseMode('business');goto('calendar');return;
  case 'new-place':editorOpen('place');return;
