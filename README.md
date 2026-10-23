@@ -1,9 +1,9 @@
-# MR-Hausservice V1.9.9.0 – Frauen-Gesundheit
+# MR-Hausservice V1.9.9.1
 
-- Gesundheit als eigenständiger Hauptbereich in der MR-App mit nahtlosem Design und sechs Modultasten.
-- Doppelte Kopfzeile und zweite Navigationsleiste der eingebetteten Frauen-App entfallen.
-- Der Inhalt bleibt unverändert erhalten; die eingebettete Ansicht wächst passend zur Inhaltshöhe.
-- Passwortfreie automatische Freigabe bei neuen/umgestellten Tresoren. Leere Alttresore werden ohne Eingabe umgestellt.
-- **Wichtig:** Bei bereits verschlüsselten persönlichen Gesundheitsdaten muss das bisherige Passwort genau einmal eingegeben werden, um die Daten verlustfrei zu migrieren. Danach keine Passwortabfrage mehr. Ein automatischer Zugriff ohne Schlüssel ist technisch unmöglich.
-- Backups mit dem lokalen Entschlüsselungsschlüssel sind hochsensibel; nicht in öffentliche Repositories hochladen.
-- Vor dem Update eine Gesamtsicherung aus der App exportieren, und keine Website-Daten löschen.
+- Privates Putzlager beginnt leer, alte unveränderte Mustervorlagen werden nach Prüfung entfernt. Selbst erfasste/verwendete Daten bleiben erhalten.
+- Reinigungsstatistik: Diagramme der letzten sechs Monate sowie Zeit je Raum.
+- Räume: Aufgaben pro Raum, direktes Anlegen, Freihand-Grundriss mit gespeicherten geschlossenen Raumflächen.
+- Privatfinanzen: Einkaufsliste, Preisplanung, Checkout in Ausgaben, manuelle Buchungen, Monatsbudgets, Fixkosten, Sparziele, CSV.
+- Alle Daten lokal im bisherigen MR-Datenspeicher / Gesamtsicherung; keine Bank-Synchronisierung.
+
+**Wichtig:** Die ZIP enthält nur Programmcode, nicht die persönlichen Daten. Vor dem Update die Gesamtsicherung in der App exportieren, nicht Browserdaten löschen.
