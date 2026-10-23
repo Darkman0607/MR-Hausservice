@@ -1,0 +1,34 @@
+.l2-knowledge-entry{margin:14px 0}
+.l2-knowledge-link{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;min-height:70px;padding:14px 42px 14px 16px;border:1px solid #27997e;border-radius:16px;background:linear-gradient(115deg,#102a32,#154a42);color:#f0fff6;text-align:left;font-weight:700;font-size:16px;box-shadow:0 6px 22px #0a232622}
+.l2-knowledge-link small{display:block;font-size:12px;color:#c8ddd5;font-weight:400}
+.l2-knowledge-link span{position:absolute;right:16px;top:22px;font-size:26px;color:#8ef4c7}
+.mrdoc-overlay[hidden],.mrdoc-type-fields[hidden]{display:none!important}
+.mrdoc-overlay{position:fixed;z-index:19000;inset:0;background:#030e12dd;display:flex;align-items:center;justify-content:center;padding:12px;overscroll-behavior:contain}
+.mrdoc-dialog{background:#10212a;color:#edf7f3;border:1px solid #397268;border-radius:20px;display:flex;flex-direction:column;width:min(660px,100%);max-height:calc(100dvh - 26px);box-shadow:0 20px 65px #0008;overflow:hidden}
+.mrdoc-head{display:flex;gap:8px;justify-content:space-between;align-items:center;border-bottom:1px solid #335551;padding:14px 16px;background:#162f34}
+.mrdoc-head h2{font-size:19px;margin:0 0 4px;line-height:1.25;color:#ebfff8}
+.mrdoc-head small{color:#accfc3;font-size:12px}
+.mrdoc-body{overflow-y:auto;padding:16px;overscroll-behavior:contain}
+.mrdoc-notice:empty{display:none}
+.mrdoc-notice{padding:8px 16px;color:#a7f2bf;background:#133b2e;font-size:13px}
+.mrdoc-notice.error{background:#63262c;color:#fff1ef}
+.mrdoc-help,.mrdoc-footnote{font-size:13px;line-height:1.5;color:#b6cec7;margin:5px 0 14px}
+.mrdoc-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin:15px 0}
+.mrdoc-toolbar>span{font-size:13px;color:#aed0c2}
+.mrdoc-btn{cursor:pointer;background:#263d47;border:1px solid #44635e;color:#effff7;padding:9px 12px;border-radius:11px;min-height:40px;font:inherit;font-size:13px;font-weight:650}
+.mrdoc-btn.main{background:#167354;border-color:#339874;color:white}.mrdoc-btn.danger{color:#ffb7bc;border-color:#a65359}.mrdoc-btn.close{background:#263c44;white-space:nowrap}
+.mrdoc-item{width:100%;display:flex;align-items:center;gap:12px;padding:14px 10px;border-radius:13px;background:#1c333b;color:white;border:1px solid #3a5659;margin:8px 0;text-align:left;cursor:pointer}
+.mrdoc-symbol{font-size:25px}.mrdoc-item-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}.mrdoc-item-main strong{font-size:14px;overflow-wrap:anywhere}.mrdoc-item-main small{color:#b3cbc4;font-size:12px}
+.mrdoc-empty{padding:22px;border:1px dashed #53776c;border-radius:12px;color:#bdd4cd;text-align:center;font-size:14px}
+.mrdoc-form label{display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:650;color:#dfede7;margin-bottom:14px}
+.mrdoc-form input,.mrdoc-form select,.mrdoc-form textarea{width:100%;box-sizing:border-box;background:#091b24;color:#f3f8f7;border:1px solid #51716b;border-radius:10px;padding:12px;font:inherit;font-size:16px;min-height:43px}
+.mrdoc-form input[type=file]{font-size:13px}.mrdoc-form small{display:block;color:#a9c3ba;font-size:12px;margin:-7px 0 13px}
+.mrdoc-panel{border:1px solid #355750;border-radius:15px;padding:14px;background:#182c33}
+.mrdoc-panel h3{font-size:19px;margin:6px 0 15px;overflow-wrap:anywhere}.mrdoc-category{color:#9fe5bf;font-size:12px}
+.mrdoc-description{line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;color:#dceee9;margin:10px 0}
+.mrdoc-fileinfo{margin-top:20px;color:#c5e2d8;font-size:13px;overflow-wrap:anywhere}
+.mrdoc-text{white-space:pre-wrap;overflow-wrap:anywhere;background:#0d2027;border-radius:12px;padding:15px;line-height:1.6}
+.mrdoc-checks label{display:flex;align-items:flex-start;gap:12px;padding:12px 6px;border-bottom:1px solid #2b4a4b;font-size:14px}.mrdoc-checks input{width:19px;height:19px;flex:0 0 auto;accent-color:#38af83}
+.mrdoc-date{display:block;margin-top:15px;font-size:12px;color:#a4b6b5}
+.mrdoc-preview-img{display:block;width:100%;height:auto;object-fit:contain;border-radius:9px}.mrdoc-preview-pdf{display:block;width:100%;height:60dvh;border:0;background:white;border-radius:8px}.mrdoc-preview-text{white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:410px){.mrdoc-head h2{font-size:16px}.mrdoc-body{padding:12px}.mrdoc-dialog{max-height:calc(100dvh - 12px)}.mrdoc-overlay{padding:6px}}
