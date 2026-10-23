@@ -1,0 +1,39 @@
+/* MR-Hausservice V1.9.8.9 – Premium-Feinschliff, nur Haushaltsmodul */
+body.premium-v192 #mrp-household-root{font-family:system-ui,-apple-system,'Segoe UI',sans-serif!important;color:#f0fff9}
+body.premium-v192 #mrp-household-root .mrc-hero{min-height:236px;padding:18px 15px 11px;margin:7px 0 17px;background:linear-gradient(110deg,#053e35,#0c4e3f 58%,#082a29);border-color:#60e6bd;box-shadow:0 0 26px #3cffaa29,0 12px 28px #0008}
+body.premium-v192 #mrp-household-root .mrc-hero:before{inset:0 0 67px 39%;mask-image:linear-gradient(to right,transparent,#000 22%);-webkit-mask-image:linear-gradient(to right,transparent,#000 22%);opacity:.84;background-size:cover;background-position:75% center;filter:saturate(1.24) contrast(1.16)}
+body.premium-v192 #mrp-household-root .mrc-hero:after{right:24px;top:7px;width:120px;height:61px;border-color:#a6ffe1;opacity:.53;box-shadow:0 -4px 18px #8affdc77}
+body.premium-v192 #mrp-household-root .mrc-hero h1{max-width:75%;font:850 clamp(23px,5.9vw,32px)/1.18 system-ui!important;letter-spacing:-.8px;margin:16px 0 11px!important;color:#fff!important}
+body.premium-v192 #mrp-household-root .mrc-hero p{max-width:59%;font:450 12px/1.6 system-ui;margin-bottom:14px}
+body.premium-v192 #mrp-household-root .mrc-hero>small{font:750 11px/1.2 system-ui;letter-spacing:1.2px}
+body.premium-v192 #mrp-household-root .mrc-hero-stats{min-height:64px;padding:8px 2px;background:#063b32eb;border-color:#6fe5bbae;border-radius:17px;box-shadow:0 5px 17px #0008}
+body.premium-v192 #mrp-household-root .mrc-hero-stats span{display:grid;grid-template-columns:29px auto;grid-template-rows:23px 15px;column-gap:4px;align-items:center;justify-content:center;text-align:left;font:500 11px system-ui;flex-wrap:nowrap;padding:1px 3px}
+body.premium-v192 #mrp-household-root .mrc-hero-stats svg{grid-row:1/3;stroke:#71ffce;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;width:26px;height:26px;filter:drop-shadow(0 0 5px #65ffd788)}
+body.premium-v192 #mrp-household-root .mrc-hero-stats b{width:auto;grid-column:2;grid-row:1;font:800 20px system-ui;color:#fff}
+body.premium-v192 #mrp-household-root .mrc-hero-stats small{grid-column:2;grid-row:2;font:500 10px system-ui;color:#d8f7ee}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs{gap:8px!important;margin:17px 0 19px!important}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button{min-height:119px!important;padding:7px 3px 13px!important;border-radius:18px;background:linear-gradient(147deg,#115747,#082c2a 58%,#081e21);font:750 11px/1.15 system-ui!important;letter-spacing:-.25px;border-color:#397d6c;box-shadow:0 7px 16px #0008,inset 0 1px #ceffe03e;touch-action:manipulation}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button:before{background-image:none!important;display:grid;place-items:center;content:'🏠';width:67px;height:72px;flex-basis:72px;font:normal 51px/1.1 'Noto Color Emoji','Segoe UI Emoji',sans-serif;filter:drop-shadow(0 5px 4px #001e1ca8)}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button:nth-child(2):before{content:'🛋️'}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button:nth-child(3):before{content:'🗓️'}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button:nth-child(4):before{content:'🧴'}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button:nth-child(5):before{content:'📦'}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button:nth-child(6):before{content:'⚙️'}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button:nth-child(7):before{content:'📊'}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button.active{background:linear-gradient(140deg,#0c7e5c,#064637);border-color:#a1ffdd;box-shadow:0 0 0 1px #66ffcd,0 0 20px #3affb37d,inset 0 1px #e3fff988}
+body.premium-v192 #mrp-household-root .mrc-title h2{font:800 clamp(21px,5.7vw,29px)/1.18 system-ui!important;letter-spacing:-.5px}
+body.premium-v192 #mrp-household-root .mrc-title p{font:450 12px/1.5 system-ui!important}
+body.premium-v192 #mrp-household-root .mrc-actions{gap:10px;margin:13px 0 15px}
+body.premium-v192 #mrp-household-root .mrc-actions button{min-height:157px!important;border-radius:18px;padding:11px!important;box-shadow:0 8px 17px #0009,inset 0 1px #dbfff542;touch-action:manipulation}
+body.premium-v192 #mrp-household-root .mrc-actions button:before{opacity:.95;filter:saturate(1.35) contrast(1.18);inset:0 0 0 27%}
+body.premium-v192 #mrp-household-root .mrc-actions button strong{width:39px;height:39px;font:750 23px/1 system-ui}
+body.premium-v192 #mrp-household-root .mrc-actions button b{position:relative;font:750 13px/1.2 system-ui!important;z-index:2}
+body.premium-v192 #mrp-household-root .mrc-actions button small{position:relative;font:450 11px/1.3 system-ui!important;z-index:2}
+body.premium-v192 #mrp-household-root .mrc-summary{gap:9px;margin:12px 0 17px}
+body.premium-v192 #mrp-household-root .mrc-summary>div{min-height:76px;padding:12px 4px!important;border-radius:17px;background:linear-gradient(135deg,#0a3234,#0c2430);border-color:#377a6a}
+body.premium-v192 #mrp-household-root .mrc-summary b{font:800 23px system-ui!important}
+body.premium-v192 #mrp-household-root .mrc-summary small{font:500 10px system-ui!important}
+body.premium-v192 #mrp-household-root .mrp-tab-panel>.mrp-panel{border:1px solid #306a6d;border-radius:19px;background:linear-gradient(140deg,#0d2730,#091d27);padding:15px 13px;margin:13px 0}
+body.premium-v192 #mrp-household-root .mrp-tab-panel>.mrp-panel h2{font:750 17px/1.25 system-ui!important}
+body.premium-v192 #mrp-household-root button:focus-visible{outline:2px solid #caffeb;outline-offset:2px}
+@media(max-width:390px){body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs{gap:6px!important}body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button{min-height:104px!important;font-size:10px!important;padding:5px 1px 9px!important}body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button:before{font-size:42px;width:54px;height:59px;flex-basis:59px}body.premium-v192 #mrp-household-root .mrc-actions button{min-height:150px!important}body.premium-v192 #mrp-household-root .mrc-hero{min-height:219px;padding:13px 12px 10px}body.premium-v192 #mrp-household-root .mrc-hero h1{font-size:22px!important}body.premium-v192 #mrp-household-root .mrc-hero-stats svg{height:22px;width:22px}body.premium-v192 #mrp-household-root .mrc-hero-stats span{grid-template-columns:23px auto;column-gap:1px}body.premium-v192 #mrp-household-root .mrc-hero-stats b{font-size:18px}}
