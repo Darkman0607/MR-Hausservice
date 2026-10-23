@@ -109,3 +109,46 @@ body.premium-v192 .v2-import-page>h2{font-size:22px!important;margin:6px 0 6px;c
 .v2-import-note img{width:40px;height:40px}.v2-import-note b{display:block;color:#75ecc1;font-size:15px}.v2-import-note small{display:block;color:#b6d8cf;font-size:11px;line-height:1.5;margin-top:4px}
 .v2-import-primary{width:100%;min-height:51px;border-radius:16px;background:linear-gradient(125deg,#2fca91,#4eecb0);border:1px solid #8affce;color:#082b24;font-weight:850;box-shadow:0 9px 16px #0ac08433}
 .v2-import-primary span{float:right;margin-right:8px}.v2-import-secondary{margin:9px 0;width:100%;border:1px solid #396a61;background:#162e32;color:#d8f7ec;border-radius:13px;min-height:44px;font-size:12px;font-weight:650}
+
+
+/* V1.9.8.3 – Familienzentrale inspired by chosen mockup */
+.mrf-home{padding-bottom:18px}
+.mrf-mode-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:2px 0 18px}
+.mrf-mode-card{position:relative;min-height:96px;padding:14px 12px;text-align:left;border-radius:18px;border:1px solid #31525b;background:linear-gradient(145deg,#152932,#0e1d25);color:#eff9f7;display:flex;flex-direction:column;justify-content:flex-end;gap:7px;box-shadow:0 9px 18px #0006,inset 0 1px #ffffff10}
+.mrf-mode-card .mrf-mode-icon{position:absolute;top:13px;left:13px;width:34px;height:34px;display:grid;place-items:center}
+.mrf-mode-card .mrf-mode-icon img{width:32px;height:32px;object-fit:contain;filter:drop-shadow(0 2px 5px #0008)}
+.mrf-mode-card b{display:block;font-size:15px;line-height:1.1;color:#f6fbfb}
+.mrf-mode-card small{display:block;font-size:11px;color:#a9c3c4;margin-top:2px}
+.mrf-mode-card.active{background:linear-gradient(145deg,#42e0ae,#1ab785);border-color:#90ffd4;color:#07221d;box-shadow:0 12px 24px #0fb9894a,inset 0 1px #d2ffe9}
+.mrf-mode-card.active b,.mrf-mode-card.active small{color:#06211d}
+.mrf-mode-card.mrf-mode-health{background:radial-gradient(circle at 88% 12%,#6a385930,transparent 52%),linear-gradient(145deg,#242736,#111e27);border-color:#6a5565}
+.mrf-welcome{margin:2px 2px 16px}
+.mrf-welcome h1{margin:0 0 5px!important;font-size:27px!important;color:#f5fbfb}.mrf-welcome h1 span{color:#58efb8}.mrf-welcome p{margin:0;color:#b0c6c6;font-size:13px;line-height:1.45}
+.mrf-module-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mrf-module{position:relative;overflow:hidden;min-height:160px;padding:12px 12px 14px;text-align:left;border-radius:18px;border:1px solid #305059;background:linear-gradient(145deg,#152a33,#0f1d25);color:#eff8f7;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 10px 22px #0007,inset 0 1px #ffffff10}
+.mrf-module .mrf-module-art{position:absolute;inset:0 0 auto 0;height:76px;border-bottom:1px solid rgba(255,255,255,.05);background:radial-gradient(circle at 80% 18%,rgba(255,255,255,.16),transparent 32%),linear-gradient(135deg,rgba(34,91,80,.82),rgba(19,42,48,.88));display:block}
+.mrf-module strong{position:relative;display:block;font-size:17px;line-height:1.1;color:#f6fbfb;letter-spacing:-.3px}
+.mrf-module small{position:relative;display:block;margin-top:6px;font-size:12px;line-height:1.35;color:#d6eaeb}
+.mrf-module em{position:relative;display:block;margin-top:7px;font-style:normal;font-size:10px;color:#97beb6}
+.mrf-module i{position:absolute;right:11px;bottom:11px;font-style:normal;font-size:26px;color:#8beecb}
+.mrf-module.mrf-household .mrf-module-art{background:radial-gradient(circle at 78% 20%,rgba(255,255,255,.17),transparent 30%),linear-gradient(135deg,#2f7e6f,#14343f)}
+.mrf-module.mrf-household .mrf-module-art::before{content:"🏠🪣";position:absolute;left:12px;bottom:8px;font-size:34px;letter-spacing:4px}
+.mrf-module.mrf-fridge .mrf-module-art{background:radial-gradient(circle at 78% 20%,rgba(255,255,255,.15),transparent 30%),linear-gradient(135deg,#537920,#183731)}
+.mrf-module.mrf-fridge .mrf-module-art::before{content:"🍅🥬🥛";position:absolute;left:10px;bottom:8px;font-size:28px;letter-spacing:2px}
+.mrf-module.mrf-shopping .mrf-module-art{background:radial-gradient(circle at 78% 20%,rgba(255,255,255,.16),transparent 30%),linear-gradient(135deg,#8a7524,#23394a)}
+.mrf-module.mrf-shopping .mrf-module-art::before{content:"🛒🍎🥖";position:absolute;left:10px;bottom:7px;font-size:28px;letter-spacing:2px}
+.mrf-module.mrf-finance .mrf-module-art{background:radial-gradient(circle at 78% 20%,rgba(255,255,255,.15),transparent 30%),linear-gradient(135deg,#6a4e1e,#232d46)}
+.mrf-module.mrf-finance .mrf-module-art::before{content:"💰🧮";position:absolute;left:12px;bottom:8px;font-size:31px;letter-spacing:4px}
+.mrf-module.mrf-school .mrf-module-art{background:radial-gradient(circle at 78% 20%,rgba(255,255,255,.14),transparent 30%),linear-gradient(135deg,#3d5f99,#312a53)}
+.mrf-module.mrf-school .mrf-module-art::before{content:"🎒📚";position:absolute;left:12px;bottom:7px;font-size:31px;letter-spacing:4px}
+.mrf-module.mrf-reminder .mrf-module-art{background:radial-gradient(circle at 78% 20%,rgba(255,255,255,.15),transparent 30%),linear-gradient(135deg,#54795f,#2f3b6a)}
+.mrf-module.mrf-reminder .mrf-module-art::before{content:"🗓️⏰";position:absolute;left:12px;bottom:8px;font-size:30px;letter-spacing:4px}
+.mrf-module.mrf-vehicle .mrf-module-art{background:radial-gradient(circle at 78% 20%,rgba(255,255,255,.14),transparent 30%),linear-gradient(135deg,#3e5b65,#252f49)}
+.mrf-module.mrf-vehicle .mrf-module-art::before{content:"🚗🔧";position:absolute;left:12px;bottom:8px;font-size:30px;letter-spacing:4px}
+.mrf-module.mrf-docs .mrf-module-art{background:radial-gradient(circle at 78% 20%,rgba(255,255,255,.16),transparent 30%),linear-gradient(135deg,#6d5b39,#26313f)}
+.mrf-module.mrf-docs .mrf-module-art::before{content:"📂📄";position:absolute;left:12px;bottom:8px;font-size:31px;letter-spacing:4px}
+.mrf-module.mrf-project .mrf-module-art{background:radial-gradient(circle at 78% 20%,rgba(255,255,255,.16),transparent 30%),linear-gradient(135deg,#4e6f3d,#2a3940)}
+.mrf-module.mrf-project .mrf-module-art::before{content:"🏡🛠️";position:absolute;left:12px;bottom:8px;font-size:30px;letter-spacing:4px}
+.mrf-module.mrf-notes .mrf-module-art{background:radial-gradient(circle at 78% 20%,rgba(255,255,255,.16),transparent 30%),linear-gradient(135deg,#604f6c,#273241)}
+.mrf-module.mrf-notes .mrf-module-art::before{content:"📝📋";position:absolute;left:12px;bottom:8px;font-size:30px;letter-spacing:4px}
+@media(max-width:380px){.mrf-mode-card{min-height:90px;padding:11px 10px}.mrf-mode-card b{font-size:13px}.mrf-mode-card small{font-size:10px}.mrf-module{min-height:150px;padding:10px 10px 12px}.mrf-module strong{font-size:15px}.mrf-module small{font-size:11px}}
