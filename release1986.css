@@ -1,0 +1,4 @@
+/* MR-Hausservice 1.9.8.6 – sichtbare Version, keine bestehenden Layouts überschrieben */
+body.premium-v192 header .v2-brand .mr1986-version{display:inline-flex;align-items:center;margin-top:4px;padding:2px 7px;border:1px solid #36765e;border-radius:999px;background:#123b30;color:#83f2c2;font-size:10px;font-weight:750;letter-spacing:.02em;line-height:1.4}
+body.premium-v192 #profile .mr1986-profile-version{display:inline-flex;align-items:center;padding:7px 11px;border-radius:12px;background:#102d29;border:1px solid #366a5e;color:#92eac7;font-size:12px;font-weight:750;margin:0 0 15px}
+@media(max-width:375px){body.premium-v192 header .v2-brand .mr1986-version{font-size:9px;margin-top:2px;padding:1px 5px}}
