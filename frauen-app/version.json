@@ -1,6 +1,6 @@
 {
-  "version": "0.1.9.4",
+  "version": "0.1.9.5",
   "released": "2026-10-23",
-  "notes": "Integration in MR-Hausservice: automatische lokale Freigabe ohne Passwortabfrage, gleiche Funktionen, Frauen-Bereich weiterhin privat in eigener Datenbank.",
-  "build": 18
+  "notes": "Bugfix: Passwortlose Datenbank mit zufälligem Schlüssel; Migration früherer Daten, kompatible Gesamtsicherung.",
+  "build": 19
 }

@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='0.1.9.4', APP_BUILD=18, DB='frauen-app-beta', DB_VERSION=2;
+const APP_VERSION='0.1.9.5', APP_BUILD=19, DB='frauen-app-beta', DB_VERSION=2;
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const categories=['Periode','Zwischenblutung','Ausfluss','Flüssigkeitsverlust','Sexualität','Kinderwunsch','Zervixschleim / Eisprung','Basaltemperatur','Schwangerschaftstest','Schmerzen','Brustveränderung','Vulva / Scheide','WC / Ausscheidung','Wohlbefinden','Schwangerschaft','Kindsbewegungen / Wehen','Frauenarzttermin','Abstrich / Laboruntersuchung','Geburt / Wochenbett','Gemeinsame Selbstkontrolle','Krankheit / Allgemeinsymptome'];
 const categoryIcons = {
@@ -44,8 +44,18 @@ async function unpackRecord(name,value){const data=await unseal(value);if(name==
 async function all(name){const rows=await readRaw(name);if(!dataKey)throw Error('Gesundheitsdaten sind gesperrt');return Promise.all(rows.map(x=>unpackRecord(name,x)));}
 async function put(name,obj){const enc=await packRecord(name,obj);return new Promise((ok,no)=>{const tx=db.transaction(name,'readwrite');tx.objectStore(name).put(enc);tx.oncomplete=()=>ok();tx.onerror=()=>no(tx.error);tx.onabort=()=>no(tx.error||Error('Speicherfehler'));});}
 function del(name,id){return new Promise((ok,no)=>{const tx=db.transaction(name,'readwrite');tx.objectStore(name).delete(id);tx.oncomplete=()=>ok();tx.onerror=()=>no(tx.error);tx.onabort=()=>no(tx.error||Error('Löschfehler'));});}
-function isAutoMeta(meta){return !!(meta&&((meta.mode&&meta.mode==='auto-device')||meta.noPassword===1));}
-async function writeAutoProtectedData(clearEntries,clearPhotos){const salt=randomBytes(16),iterations=350000,key=await makeDataKey(AUTO_UNLOCK_PASS,salt,iterations);const es=await Promise.all(clearEntries.map(e=>seal(e,e.id,key)));const ps=[];for(const photo of clearPhotos){const bytes=await photo.blob.arrayBuffer();ps.push(await seal({...photo,blobType:photo.blob.type,blob:toB64(bytes)},photo.id,key));}const check=await seal({value:SECURE_CHECK},'check',key);await new Promise((ok,no)=>{const tx=db.transaction(['entries','photos','security'],'readwrite');const e=tx.objectStore('entries'),p=tx.objectStore('photos'),s=tx.objectStore('security');e.clear();p.clear();s.clear();for(const row of es)e.put(row);for(const row of ps)p.put(row);s.put({id:'local',salt:toB64(salt),iterations,check,created:new Date().toISOString(),noPassword:1,mode:'auto-device'});tx.oncomplete=()=>ok();tx.onerror=()=>no(tx.error||Error('Auto-Schutz konnte nicht gespeichert werden'));tx.onabort=()=>no(tx.error||Error('Auto-Schutz abgebrochen'));});dataKey=key;}
+function isAutoMeta(meta){return !!(meta&&((meta.mode&&meta.mode==='auto-device')||meta.mode==='auto-local-v2'||meta.noPassword===1));}
+async function importedAutoKey(raw){if(!raw||!/^[A-Za-z0-9+/]{42}[AEIMQUYcgkosw048]=$/.test(raw))throw Error('Automatischer Datenschlüssel fehlt oder ist ungültig.');return crypto.subtle.importKey('raw',fromB64(raw),{name:'AES-GCM'},false,['encrypt','decrypt']);}
+async function writeAutoProtectedData(clearEntries,clearPhotos){
+ // Ohne Passwort: zufälliger Schlüssel je Datensatz, mit Sicherheitsmetadaten gesichert.
+ // Mit einer MR-Gesamtsicherung wird auch dieser Schlüssel kopiert (kein Schutz vor Zugriff auf die Sicherungsdatei).
+ const keyBytes=randomBytes(32),key=await crypto.subtle.importKey('raw',keyBytes,{name:'AES-GCM'},false,['encrypt','decrypt']);
+ const es=await Promise.all(clearEntries.map(e=>seal(e,e.id,key))),ps=[];
+ for(const photo of clearPhotos){const bytes=await photo.blob.arrayBuffer();ps.push(await seal({...photo,blobType:photo.blob.type,blob:toB64(bytes)},photo.id,key));}
+ const check=await seal({value:SECURE_CHECK},'check',key),salt=randomBytes(16);
+ await new Promise((ok,no)=>{const tx=db.transaction(['entries','photos','security'],'readwrite');const e=tx.objectStore('entries'),p=tx.objectStore('photos'),s=tx.objectStore('security');e.clear();p.clear();s.clear();for(const row of es)e.put(row);for(const row of ps)p.put(row);s.put({id:'local',salt:toB64(salt),iterations:350000,check,created:new Date().toISOString(),noPassword:1,mode:'auto-local-v2',autoKey:toB64(keyBytes)});tx.oncomplete=()=>ok();tx.onerror=()=>no(tx.error||Error('Automatische Verschlüsselung konnte nicht gespeichert werden'));tx.onabort=()=>no(tx.error||Error('Automatische Verschlüsselung abgebrochen'));});
+ dataKey=key;
+}
 async function migrateCurrentVaultToAuto(){const clearEntries=await all('entries');const clearPhotos=await all('photos');await writeAutoProtectedData(clearEntries,clearPhotos);}
 function requestDataPassword(isNew, initialError=""){
  return new Promise((resolve,reject)=>{
@@ -55,28 +65,33 @@ function requestDataPassword(isNew, initialError=""){
   form.addEventListener('submit',event=>{event.preventDefault();const pass=$('data-password').value,confirmPass=isNew?$('data-password-confirm').value:pass;if(isNew&&pass.length<12){error.textContent='Bitte mindestens 12 Zeichen eingeben.';return;}if(isNew&&pass!==confirmPass){error.textContent='Die Passwörter stimmen nicht überein.';return;}form.querySelector('button').disabled=true;resolve(pass);},{once:false});
  });
 }
-async function unlockLocal(){if(!crypto?.subtle)throw Error('Web Crypto nicht verfügbar; HTTPS erforderlich');const meta=await readMeta();if(meta&&isAutoMeta(meta)){const key=await makeDataKey(AUTO_UNLOCK_PASS,fromB64(meta.salt),meta.iterations);const marker=await unseal(meta.check,key);if(marker.value!==SECURE_CHECK)throw Error('Automatischer Prüfwert fehlerhaft');dataKey=key;return;}
-if(meta){
-  let promptError='';
-  for(;;){
-    const pass=await requestDataPassword(false,promptError||'Einmalig das bisherige Passwort eingeben. Danach wird die Passwortabfrage entfernt.');
-    try{
-      const key=await makeDataKey(pass,fromB64(meta.salt),meta.iterations);
-      const marker=await unseal(meta.check,key);
-      if(marker.value!==SECURE_CHECK)throw Error('Prüfwert fehlerhaft');
-      dataKey=key;
-      await migrateCurrentVaultToAuto();
-      return;
-    }catch(e){
-      promptError='Passwort stimmt nicht oder die Daten können nicht entschlüsselt werden. Bitte erneut eingeben.';
-    }
-  }
-}
-const entries=await readRaw('entries');
-const photoRows=await readRaw('photos');
-const clearEntries=entries.filter(Boolean);
-const clearPhotos=photoRows.filter(Boolean).map(photo=>photo.blob instanceof Blob?photo:{...photo,blob:new Blob([photo.blob],{type:photo.blob?.type||'application/octet-stream'})});
-await writeAutoProtectedData(clearEntries,clearPhotos);
+async function unlockLocal(){
+ if(!crypto?.subtle)throw Error('Web Crypto nicht verfügbar; HTTPS erforderlich');const meta=await readMeta();
+ if(meta?.mode==='auto-local-v2'){
+   const key=await importedAutoKey(meta.autoKey),marker=await unseal(meta.check,key);
+   if(marker.value!==SECURE_CHECK)throw Error('Automatischer Prüfschlüssel passt nicht zu den Daten. Backup prüfen.');
+   dataKey=key;return;
+ }
+ if(meta&&isAutoMeta(meta)){
+   // Alte V1.9.8.3-Daten EINMAL mit altem integrierten Schlüssel laden, sofort mit Zufallsschlüssel neu verschlüsseln.
+   const old=await makeDataKey(AUTO_UNLOCK_PASS,fromB64(meta.salt),meta.iterations);
+   const marker=await unseal(meta.check,old);if(marker.value!==SECURE_CHECK)throw Error('Alte automatische Verschlüsselung beschädigt');
+   dataKey=old;await migrateCurrentVaultToAuto();return;
+ }
+ if(meta){
+   let promptError='';
+   for(;;){
+     const pass=await requestDataPassword(false,promptError||'Einmalig das bisherige Passwort eingeben. Danach wird die Passwortabfrage entfernt.');
+     let key;
+     try{key=await makeDataKey(pass,fromB64(meta.salt),meta.iterations);const marker=await unseal(meta.check,key);if(marker.value!==SECURE_CHECK)throw Error('Ungültiges Passwort');}
+     catch(e){promptError='Passwort stimmt nicht. Bitte erneut eingeben.';continue;}
+     dataKey=key;await migrateCurrentVaultToAuto();return;
+   }
+ }
+ const entries=await readRaw('entries'),photos=await readRaw('photos');
+ if(entries.some(e=>e.secure===1)||photos.some(p=>p.secure===1))throw Error('Verschlüsselte Daten ohne Prüfschlüssel erkannt. Zur Sicherheit nicht verändert.');
+ if(photos.some(p=>!(p.blob instanceof Blob)))throw Error('Fotos im Altdatenformat nicht lesbar. Bitte Sicherung prüfen.');
+ await writeAutoProtectedData(entries,photos);
 }
 async function removeEntryWithPhotos(id){
  const photos=await readRaw('photos');const target=[];
@@ -1045,5 +1060,5 @@ window.addEventListener('message',event=>{if(window.parent===window||event.sourc
  const target=event.data.target;if(!MR_ALLOWED_PAGES.has(target))return;
  if(!dataKey){mrQueuedPage=target;return}goto(target).catch(e=>console.warn('Frauen-App Navigation:',e));
 });
-async function init(){try{db=await openDB();await unlockLocal();$('update').onclick=()=>checkUpdate();$('version').textContent='v'+APP_VERSION;await render();if(mrQueuedPage){const dest=mrQueuedPage;mrQueuedPage=null;await goto(dest)}if(!location.search.includes('mr-integriert=1') && 'serviceWorker' in navigator && location.protocol==='https:'){navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(()=>{navigator.serviceWorker.addEventListener('controllerchange',()=>{/* App navigiert nach eigener Versionsprüfung; kein zweites Neuladen */})}).catch(()=>{});}setTimeout(()=>checkUpdate(true),2000);setInterval(()=>checkUpdate(true),5*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate(true)})}catch(err){const message=err?.message||'Unbekannter Fehler';const recoverable=/Mindestens 12 Zeichen|Passwörter stimmen nicht|Entsperren abgebrochen|Einrichtung abgebrochen|Datenpasswort falsch/.test(message);$('view').innerHTML='<div class="card"><h2>Lokale Daten '+(recoverable?'noch gesperrt':'nicht verfügbar')+'</h2><div class="warning">'+esc(message)+'</div><p class="muted">'+(recoverable?'Deine vorhandenen Daten wurden dadurch nicht gelöscht. Wähle ein Datenpasswort mit mindestens 12 Zeichen und wiederhole die Eingabe.':'Bitte nicht die Website-Daten oder den Browsercache löschen. Falls du bereits ein Backup hast, bewahre es auf.')+'</p><button class="primary" id="retry-unlock">'+'Passworteingabe erneut öffnen'+'</button></div>';const retry=$('retry-unlock');if(retry)retry.onclick=()=>{retry.disabled=true;init()};}}
+async function init(){try{db=await openDB();await unlockLocal();$('update').onclick=()=>checkUpdate();$('version').textContent='v'+APP_VERSION;await render();if(mrQueuedPage){const dest=mrQueuedPage;mrQueuedPage=null;await goto(dest)}if(!location.search.includes('mr-integriert=1') && 'serviceWorker' in navigator && location.protocol==='https:'){navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(()=>{navigator.serviceWorker.addEventListener('controllerchange',()=>{/* App navigiert nach eigener Versionsprüfung; kein zweites Neuladen */})}).catch(()=>{});}setTimeout(()=>checkUpdate(true),2000);setInterval(()=>checkUpdate(true),5*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate(true)})}catch(err){const message=err?.message||'Unbekannter Fehler';const recoverable=/Mindestens 12 Zeichen|Passwörter stimmen nicht|Entsperren abgebrochen|Einrichtung abgebrochen|Datenpasswort falsch/.test(message);$('view').innerHTML='<div class="card"><h2>Lokale Daten '+(recoverable?'noch gesperrt':'nicht verfügbar')+'</h2><div class="warning">'+esc(message)+'</div><p class="muted">'+(recoverable?'Deine vorhandenen Daten wurden dadurch nicht gelöscht. Wähle ein Datenpasswort mit mindestens 12 Zeichen und wiederhole die Eingabe.':'Bitte nicht die Website-Daten oder den Browsercache löschen. Falls du bereits ein Backup hast, bewahre es auf.')+'</p><button class="primary" id="retry-unlock">'+'Erneut versuchen'+'</button></div>';const retry=$('retry-unlock');if(retry)retry.onclick=()=>{retry.disabled=true;init()};}}
 init();
