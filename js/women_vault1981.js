@@ -1,4 +1,4 @@
-/* V1.9.8.1: Back up only the ALREADY ENCRYPTED women's records. No health plaintext or password in MR storage or Drive. */
+/* V1.9.8.4: Bewahrt Frauen-App-Datensätze im verschlüsselten Speicherformat auf. Bei passwortloser Nutzung ist der zur Wiederherstellung nötige Schlüssel in security enthalten! Backup-Dateien sind vertraulich. */
 'use strict';
 const MR_WOMEN_DB='frauen-app-beta';
 function mrWomenOpenVault(){return new Promise((resolve,reject)=>{
@@ -14,7 +14,7 @@ function mrWomenReadAll(db,table){return new Promise((resolve,reject)=>{
 function mrWomenCheckEncryptedRow(row){return row&&typeof row.id==='string'&&row.id.length>0&&row.id.length<300&&row.secure===1&&typeof row.iv==='string'&&/^[A-Za-z0-9+/=]{12,50}$/.test(row.iv)&&typeof row.cipher==='string'&&row.cipher.length>=12&&/^[A-Za-z0-9+/=]+$/.test(row.cipher);}
 function mrWomenCheckVault(v){
  if(!v||v.format!=='mr-frauen-vault' || v.version!==1||!Array.isArray(v.entries)||!Array.isArray(v.photos)||!v.security||v.entries.length>50000||v.photos.length>50000)throw Error('Ungültige Frauen-App Sicherung');
- const meta=v.security;if(meta.id!=='local'||typeof meta.salt!=='string'||!Number.isInteger(meta.iterations)||meta.iterations<100000||meta.iterations>1000000||!mrWomenCheckEncryptedRow(meta.check))throw Error('Ungültiger Passwort-Prüfwert der Frauen-App');
+ const meta=v.security;if(meta.id!=='local'||typeof meta.salt!=='string'||!Number.isInteger(meta.iterations)||meta.iterations<100000||meta.iterations>1000000||!mrWomenCheckEncryptedRow(meta.check))throw Error('Ungültiger Frauen-App-Prüfwert');if(meta.mode==='auto-local-v2'&&(!/^[A-Za-z0-9+/]{42}[AEIMQUYcgkosw048]=$/.test(meta.autoKey||'')))throw Error('Automatischer Schlüssel in Frauen-App-Sicherung ungültig');
  for(const rows of [v.entries,v.photos]){const seen=new Set();for(const row of rows){if(!mrWomenCheckEncryptedRow(row)||seen.has(row.id))throw Error('Unverschlüsselter, beschädigter oder doppelter Frauendatensatz');seen.add(row.id)}}
  if(v.lessonProgress!==undefined){if(!v.lessonProgress||typeof v.lessonProgress!=='object'||Array.isArray(v.lessonProgress)||Object.keys(v.lessonProgress).length>1000||Object.keys(v.lessonProgress).some(k=>!/^frauen-app-lesson-done-\d{1,4}$/.test(k)||v.lessonProgress[k]!=='1'))throw Error('Ungültiger Lernfortschritt')}
  return true;
@@ -47,4 +47,4 @@ async function mrWomenVaultRestore(vault){
  return true;
  }finally{w.close()}
 }
-window.MR_WOMEN_VAULT_BUILD='1.9.8.1';
+window.MR_WOMEN_VAULT_BUILD='1.9.8.4';
