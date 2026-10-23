@@ -1,21 +1,21 @@
 {
   "name": "MR Hausservice",
   "short_name": "MR Service",
-  "description": "MR-Hausservice V1.9.7.16 – Artikelbezogene Anleitungen, Dokumente und Checklisten",
-  "start_url": "./index.html?v=19716",
+  "description": "MR-Hausservice V1.9.7.17 – PDF öffnen, Service-Status und artikelbezogene Anleitungen",
+  "start_url": "./index.html?v=19717",
   "scope": "./",
   "display": "standalone",
   "background_color": "#09121a",
   "theme_color": "#0b2527",
   "icons": [
     {
-      "src": "icon-192.png?v=19716",
+      "src": "icon-192.png?v=19717",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png?v=19716",
+      "src": "icon-512.png?v=19717",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

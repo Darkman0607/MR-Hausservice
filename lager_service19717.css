@@ -1,0 +1,22 @@
+/* Service flag for all articles, with no change to quantity or older data. */
+#lager2-root .l3-quick-row{display:flex;flex-wrap:wrap;gap:7px}
+#lager2-root .l3-quick{flex:1 1 auto;padding:7px 9px;min-width:60px}
+#lager2-root .l3-quick:last-child{color:#ffd9a4;border-color:#846138}
+#lager2-root .l3-quick:last-child.active{background:linear-gradient(160deg,#a2651a,#75440f);color:#fff6e4;border-color:#f6aa4b}
+#lager2-root .l3-service-label{display:inline-block;color:#ffca85!important;white-space:normal;font-weight:700;font-size:11px!important}
+#lager2-root .l3-service-flag{flex:0 0 29px;min-width:29px;min-height:38px;border:1px solid #d38a37;background:#43311c;color:#ffd9a1;border-radius:10px;padding:3px;font-size:16px;box-shadow:0 0 9px #f2a13c35}
+#lager2-root .l3-grid-actions .l3-service-flag{flex:0 0 29px;min-width:29px}
+#lager2-root .l3-grid-actions .l2-btn{padding:8px 3px;font-size:11px}
+#lager2-root .l3-service-panel{border:1px solid #8f7043;border-radius:13px;background:#31291f;padding:11px;margin:15px 0;color:#ffe3b8}
+#lager2-root .l3-service-toggle{display:flex;align-items:center;gap:11px;font-size:14px;font-weight:750;color:#ffe2b1;margin:0;cursor:pointer}
+#lager2-root .l3-service-toggle input{width:23px;height:23px;min-width:23px;accent-color:#f0a33f;cursor:pointer}
+#lager2-root .l3-service-panel small{display:block;margin:7px 0 0;color:#edcfa3}
+#lager2-root .l3-service-note{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.5;color:#ffe2b5;margin:8px 0 0}
+#lager2-root .l3-editor-service{padding:8px;border-radius:10px;border:1px solid #83633e;background:#3a2b1d}
+@media(max-width:420px){#lager2-root .l3-service-flag{min-width:24px;flex-basis:24px;padding:1px;font-size:14px}#lager2-root .l3-article{gap:4px}#lager2-root .l3-qtybtn{min-width:31px}#lager2-root .l3-article-qty{gap:3px}}
+
+/* Mobile PDF actions: do not show a nonfunctional embedded viewer on Android. */
+.mrdoc-pdf-buttons{align-items:stretch}
+.mrdoc-pdf-buttons .mrdoc-btn{flex:1 1 180px;white-space:normal;line-height:1.4}
+
+#lager2-root .l2-dialog label.l3-service-toggle{display:flex;align-items:center}
