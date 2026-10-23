@@ -1,3 +1,17 @@
+# MR-Hausservice V1.9.9.3 – Fahrzeugübersicht repariert
+
+## Behobener Fehler
+Die Überschrift, Beschreibung und Kennzahlen im Fahrzeug-Dashboard wurden auf Android nebeneinander dargestellt und überlappten. Ursache: Die Fahrzeugübersicht verwendete ein `<header>`-Element und erbte dadurch das globale `display:flex`-Layout der App-Kopfzeile.
+
+- Fahrzeug-Kopfbereich in einen eigenständigen Container umgebaut.
+- Titel, Beschreibung und Kennzahlen stehen wieder untereinander.
+- Korrektur für schmale Handybreiten und längere Kostenbeträge.
+- Die vorhandenen Fahrzeugfunktionen (Tankbuch, Kilometer, Services, Rechnungsfotos) sowie die automatische Finanzanzeige und lokale Datenstruktur wurden **nicht** verändert.
+- Versionsnummern und Offline-Cache auf V1.9.9.3 aktualisiert.
+
+**Datenschutz und Sicherung:** Die vollständige ZIP enthält den Programmcode, nicht automatisch die persönlichen Browserdaten. Vor jeder Aktualisierung im Profil eine Gesamtsicherung exportieren; gespeicherte Browserdaten nicht löschen.
+
+## Vorherige Version
 # MR-Hausservice V1.9.9.2 – Fahrzeugbuch und Gesamtfinanzen
 
 ## Funktionen
