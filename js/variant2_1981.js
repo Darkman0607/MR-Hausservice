@@ -4,7 +4,9 @@
 const ALLOWED=new Set(['home','diary','calendar','learn','selfcheck','records']);
 function openWomen(target='home'){
  if(!ALLOWED.has(target))target='home';
- const btn=document.querySelector('[data-mrp-go="mrp-women"]');if(btn)btn.click();
+ // V1.9.8.2: The redesigned bottom bar has no hidden Frauen-App tab; route directly.
+ if(typeof window.goto==='function')window.goto('mrp-women');
+ else document.querySelector('[data-mrp-go="mrp-women"]')?.click();
  const frame=document.getElementById('mrw-frame');if(!frame)return;
  const send=()=>{try{frame.contentWindow?.postMessage({type:'mr-women-navigate',target},location.origin)}catch(e){console.warn('Navigation Frauen-App:',e)}};
  if(!frame.hasAttribute('src')){frame.addEventListener('load',send,{once:true});frame.setAttribute('src',frame.dataset.src)}else send();
