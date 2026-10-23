@@ -1,0 +1,26 @@
+/* UI integration V1.9.8.1 - no state rewrite of existing MR data. */
+(function(){
+'use strict';
+const ALLOWED=new Set(['home','diary','calendar','learn','selfcheck','records']);
+function openWomen(target='home'){
+ if(!ALLOWED.has(target))target='home';
+ const btn=document.querySelector('[data-mrp-go="mrp-women"]');if(btn)btn.click();
+ const frame=document.getElementById('mrw-frame');if(!frame)return;
+ const send=()=>{try{frame.contentWindow?.postMessage({type:'mr-women-navigate',target},location.origin)}catch(e){console.warn('Navigation Frauen-App:',e)}};
+ if(!frame.hasAttribute('src')){frame.addEventListener('load',send,{once:true});frame.setAttribute('src',frame.dataset.src)}else send();
+}
+document.addEventListener('click',e=>{
+ const revert=e.target.closest('[data-mrw-revert-vault]');if(revert){
+   e.preventDefault();(async()=>{try{
+    if(typeof storage==='undefined'||!storage)throw Error('Datenspeicher nicht bereit');
+    const point=await new Promise((res,rej)=>{const tx=storage.transaction('state','readonly');const r=tx.objectStore('state').get('women_pre_restore');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+    if(!point?.vault)throw Error('Noch kein Frauen-App-Schutzpunkt vorhanden. Er entsteht bei der Wiederherstellung eines verschlüsselten Gesamtsicherungsstands.');
+    if(!confirm('Frauen-App-Daten des Schutzpunkts vom '+new Date(point.created).toLocaleString('de-AT')+' wiederherstellen? Alle aktuellen Gesundheitsdaten werden ersetzt. Bitte vorher zusätzlich sichern.'))return;
+    await mrWomenVaultRestore(point.vault);alert('Frauen-App-Schutzpunkt wiederhergestellt. Bitte Frauen-App wieder öffnen und entsperren.');
+   }catch(err){alert('Schutzpunkt: '+err.message)}})();return;
+ }
+ const el=e.target.closest('[data-mrw-open]');if(el){e.preventDefault();openWomen(el.dataset.mrwOpen);return}
+ const nav=e.target.closest('[data-mrp-go="mrp-women"]');if(nav){const frame=document.getElementById('mrw-frame');if(frame&&!frame.hasAttribute('src'))frame.setAttribute('src',frame.dataset.src)}
+});
+window.MR_V2_OPEN_WOMEN=openWomen;
+})();

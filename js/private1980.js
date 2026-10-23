@@ -2,7 +2,7 @@
    Do not import commercial objects automatically; old backup and PDF paths stay intact. */
 (function(){
 'use strict';
-const VERSION='1.9.8.0';
+const VERSION='1.9.8.1';
 const types=['Objekt','Stockwerk / Bereich','Raum','Zone','Schrank','Lagerplatz'];
 const tabs=[['overview','Übersicht'],['places','Objekte & Räume'],['tasks','Putzpläne'],['clean','Reinigung'],['supplies','Material'],['devices','Geräte'],['reports','Statistik']];
 let tab='overview',editor=null,mode='business',booted=false;
@@ -46,11 +46,22 @@ const prevGoto=goto;
 goto=function(page){if(!page.startsWith('mrp-')){if(mode!=='business'){mode='business';document.body.dataset.mrpMode='business';document.querySelectorAll('[data-mrp-switch]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mrpSwitch==='business')))}prevGoto(page);return}goPrivate(page)};
 const originalRender=render;
 render=function(){originalRender();refresh()};
-function privateHome(){const h=state(),tasks=dueTasks();const completed=h.sessions.length,ms=h.sessions.reduce((x,s)=>x+n(s.durationMs),0);const current=h.active;
- return `<div class="mrp-hero"><small>MR PRIVAT · Grundsystem ${VERSION}</small><h1>Dein privater Alltag</h1><small>Private Daten getrennt vom Gewerbe · Sicherung über „Profil → Gesamte App sichern“</small></div>
- <div class="mrp-cards"><div class="mrp-stat"><b>${h.places.filter(p=>p.type==='Objekt').length}</b><small>Objekte</small></div><div class="mrp-stat"><b>${tasks.length}</b><small>Fällige Putzaufgaben</small></div><div class="mrp-stat"><b>${completed}</b><small>Reinigungen</small></div><div class="mrp-stat"><b>${maintenanceDue().length}</b><small>Geräte-Wartungen</small></div></div>
- <div class="mrp-panel"><div class="mrp-section-head"><h2>🧹 Haushalt & Putzen</h2>${button('open-household','Öffnen','','primary')}</div><p>Objekte und Räume, Reinigungspläne, Timer, Checklisten, Material, Haushaltsgeräte und Statistiken.</p>${current?'<div class="mrp-pill due">⏱ Reinigung läuft oder pausiert</div>':''}</div>
- <h2>Weitere private Module – vorbereitet</h2><div class="mrp-quick">${[['🥛','Kühlschrank & Vorräte'],['🛒','Einkaufen & Essen'],['💶','Privatfinanzen'],['🎓','Familie & Schule'],['📅','Termine'],['🚗','Fahrzeuge'],['📁','Dokumente'],['📋','Projekte']].map(x=>`<button type="button" data-mrp-action="planned"><strong>${x[0]}</strong>${x[1]}<small style="display:block;color:#aed1c6;margin-top:3px">Geplant</small></button>`).join('')}</div>`
+function privateHome(){const h=state(),tasks=dueTasks(),cleanings=h.sessions.length,service=maintenanceDue().length;
+ const workTiles=[
+  ['icons3d/ui-clean.svg','Haushalt & Putzen','Reinigungen, Checklisten, Aufgaben','household'],
+  ['icons3d/ui-heart.svg','Frauen-App','Zyklus, Gesundheit & Lernzentrum','women'],
+  ['icons3d/ui-calendar.svg','Gemeinsame Termine','Kalender & Tagesplanung','today'],
+  ['icons3d/ui-school.svg','Familie & Schule','Lernen, Aufgaben, Organisation','planned'],
+  ['icons3d/ui-stock.svg','Vorräte & Lager','Private Ordnung & Materialien','planned'],
+  ['icons3d/ui-money.svg','Privatfinanzen','Budget, Ausgaben & Überblick','planned'],
+  ['icons3d/ui-car.svg','Fahrzeuge','Service & Termine','planned'],
+  ['icons3d/ui-folder.svg','Dokumente','Private Unterlagen','planned']
+ ];
+ return `<div class="mr1981-hero"><div><span class="mr1981-eyebrow">DEIN PRIVATER BEREICH</span><h1>Familie & Gesundheit</h1><p>Privates Leben und Haushalt – klar getrennt vom Gewerbe</p><button class="mr1981-hero-link" type="button" data-mrw-open="home">Frauen-App öffnen →</button></div><img src="icons3d/ui-heart.svg" alt=""/></div>
+ <div class="mr1981-small-stats"><div><strong>${tasks.length}</strong><span>Putzaufgaben fällig</span></div><div><strong>${cleanings}</strong><span>Reinigungen</span></div><div><strong>${service}</strong><span>Gerätewartungen</span></div></div>
+ <div class="mr1981-subhead"><h2>Deine Bereiche</h2><small>Alles an einem Ort</small></div>
+ <div class="mr1981-feature-grid">${workTiles.map(([ic,name,description,action])=>`<button type="button" class="mr1981-feature ${action==='women'?'mr1981-pink':''}" ${action==='household'?'data-mrp-action="open-household"':action==='women'?'data-mrw-open="home"':action==='today'?'data-mrp-switch="today"':'data-mrp-action="planned"'}><span class="mr1981-feature-icon"><img src="${ic}" alt=""/></span><b>${name}</b><small>${description}</small><span class="mr1981-arrow">↗</span></button>`).join('')}</div>
+ <div class="mrp-panel"><div class="mrp-section-head"><h2>🧹 Haushalt heute</h2>${button('open-household','Öffnen')}</div><p>${tasks.length?`${tasks.length} Reinigungsaufgaben sind fällig.`:'Keine fälligen Reinigungsaufgaben.'} ${h.active?'Eine Reinigung läuft oder ist pausiert.':''}</p></div>`;
 }
 function sharedToday(){const ts=dateNow(),h=state();const appts=(Array.isArray(db.appointments)?db.appointments:[]).filter(a=>a.date===ts&&a.status!=='Abgesagt');const works=(Array.isArray(db.work)?db.work:[]).filter(w=>w.date===ts&&w.status!=='Erledigt');const dueList=dueTasks(),maintenance=maintenanceDue();const todayEntries=[...appts.map(a=>({title:a.title||'Termin',tag:a.category==='Privat'?'Privater Termin':'Termin',time:a.start||'–'})),...works.map(w=>({title:w.title||'Arbeit',tag:'Arbeit',time:'–'}))].sort((a,b)=>a.time.localeCompare(b.time));
  const header=`<div class="mrp-hero"><small>GEMEINSAME TAGESZENTRALE</small><h1>${new Date().toLocaleDateString('de-AT',{weekday:'long',day:'numeric',month:'long'})}</h1><small>Gewerbe und Privat auf einen Blick. Finanzdaten bleiben getrennt.</small></div>`;

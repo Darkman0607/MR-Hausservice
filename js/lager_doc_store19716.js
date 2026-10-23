@@ -36,11 +36,12 @@ function mrDocsAuditStock(stock,attachments){if(!Array.isArray(stock))throw Erro
 }
 function mrDocsRemapForImport(stock,attachments){mrDocsAuditStock(stock,attachments);const map=new Map(attachments.map(a=>[a.id,a.data]));const files=[];for(const x of stock)for(const d of x.l2documents||[]){const prev=d.id;d.id=uid();if(d.type==='file')files.push({id:d.id,blob:mrDocsFromDataUrl(map.get(prev))})}return files}
 function mrDocsCommitWithState(puts=[],deletes=[]){return new Promise((resolve,reject)=>{if(!storage) return reject(Error('Datenbank nicht verfügbar'));const tx=storage.transaction(['state','attachments'],'readwrite');const fileStore=tx.objectStore('attachments');for(const p of puts)fileStore.put(p.blob,String(p.id));for(const id of deletes)fileStore.delete(String(id));tx.objectStore('state').put(db,'main');tx.oncomplete=()=>{lastSaved=new Date().toLocaleString('de-AT');updateStorageStatus();resolve(true)};tx.onabort=()=>reject(tx.error||Error('Dokumentenspeicherung abgebrochen'));tx.onerror=()=>reject(tx.error||Error('Dokumentenspeicherung fehlgeschlagen'))})}
-async function mrDocsPrepareBackup(){const pkg=makeBackupPackage();pkg.attachments=await mrDocsBackup(db.stock);backupAudit193(pkg);mrDocsAuditStock(pkg.data.stock,pkg.attachments);return pkg}
+async function mrDocsPrepareBackup(){const pkg=makeBackupPackage();pkg.attachments=await mrDocsBackup(db.stock);pkg.womenVault=await mrWomenVaultSnapshot();backupAudit193(pkg);mrDocsAuditStock(pkg.data.stock,pkg.attachments);return pkg}
 async function mrDocsRestorePack(pkg){backupAudit193(pkg);const data=pkg.data||pkg;const attachments=pkg.attachments||[];mrDocsAuditStock(data.stock,attachments);
+ if(pkg.womenVault!==undefined && pkg.womenVault!==null)mrWomenCheckVault(pkg.womenVault);
  const puts=attachments.map(a=>({id:a.id,blob:mrDocsFromDataUrl(a.data)}));const previous=db;
  db={...data,work:data.work,photos:data.photos,stock:data.stock,projects:Array.isArray(data.projects)?data.projects:[],appointments:Array.isArray(data.appointments)?data.appointments:[],dayNotes:data.dayNotes||{}};
- try{await mrDocsCommitWithState(puts);return true}catch(e){db=previous;throw e}
+ let committed=false;try{await mrDocsCommitWithState(puts);committed=true;if(pkg.womenVault)await mrWomenVaultRestore(pkg.womenVault);return true}catch(e){if(!committed)db=previous;throw e}
 }
 
 // Clean up files whose articles were permanently deleted. Keep checkpoint-linked files.
