@@ -1,7 +1,17 @@
-const CACHE='mr-hausservice-v1-9-7-17';
+const CACHE='mr-hausservice-v1-9-7-18';
 const ASSETS=["./","./index.html","./work1964.css","./lager2.css","./lager_gallery19713.css","./premium1976.css","./premium1977.css","./dashboard1978.css","./dashboard1979.css","./kalender19712.css","./js/kalender19712.js","./js/dashboard1979.js","./js/dashboard1978.js","./js/lager_gallery19713.js","./js/lager2.js","./js/lager_doc_store19716.js","./js/lager_dokumente19716.js","./lager_dokumente19716.css","./lager_service19717.css","./js/inventory_metrics.js","./js/auftrag_layout1964.js","./manifest.webmanifest","./icon-192.png","./icon-512.png","./js/auftrag_typ1962.js","./js/auftrag_layout1963.js","./js/core.js","./js/verwaltung.js","./js/auftraege_medien.js","./js/backup_google.js","./js/kalender.js","./js/updates.js","./js/oberflaeche.js","./js/verbesserungen1961.js","./premium19714.css","./lager_delete19715.css","./js/icon_theme19714.js","./icons3d/box.png","./icons3d/cable.png","./icons3d/cleaning.png","./icons3d/drill.png","./icons3d/electronics.png","./icons3d/garden.png","./icons3d/gloves.png","./icons3d/paint.png","./icons3d/ui-calendar.svg","./icons3d/ui-camera.svg","./icons3d/ui-home.svg","./icons3d/ui-money.svg","./icons3d/ui-notification.svg","./icons3d/ui-profile.svg","./icons3d/ui-settings.svg","./icons3d/ui-stock.svg","./icons3d/ui-work.svg"];
-self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(CACHE);await c.addAll(['./','./index.html']);await Promise.all(ASSETS.filter(a=>a!=='./'&&a!=='./index.html').map(async a=>{try{const r=await fetch(a,{cache:'reload'});if(r.ok)await c.put(a,r)}catch(err){}}));await self.skipWaiting()})()));
-self.addEventListener('activate',e=>e.waitUntil((async()=>{const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('mr-hausservice-')&&k!==CACHE).map(k=>caches.delete(k)));await self.clients.claim()})()));
+const BUILD='19718';
+const assetKey=path=>/\.(js|css)$/i.test(path)?path+'?build='+BUILD:path;
+self.addEventListener('install',e=>e.waitUntil((async()=>{
+ const c=await caches.open(CACHE);
+ // Fetch current files independently, never let a failed image prevent the release from installing.
+ await Promise.all(ASSETS.map(async asset=>{const dest=assetKey(asset);try{const r=await fetch(new Request(dest,{cache:'reload'}));if(r.ok)await c.put(dest,r)}catch(err){}}));
+ try{const r=await fetch(new Request('./index.html',{cache:'reload'}));if(r.ok)await c.put('./index.html',r)}catch(err){}
+ await self.skipWaiting();
+})()));
+self.addEventListener('activate',e=>e.waitUntil((async()=>{
+ const ks=await caches.keys();await Promise.all(ks.filter(k=>k.startsWith('mr-hausservice-')&&k!==CACHE).map(k=>caches.delete(k)));await self.clients.claim();
+})()));
 const PDF_ROUTE=new URL('./__mrdoc/',self.registration.scope).pathname;
 function localPdfResponse(req){
  return (async()=>{
@@ -27,4 +37,18 @@ function localPdfResponse(req){
   }catch(err){return new Response('Lokale PDF-Datei konnte nicht gelesen werden: '+String(err?.message||'Fehler'),{status:500})}
  })();
 }
-self.addEventListener('fetch',e=>{if((e.request.method==='GET'||e.request.method==='HEAD')&&new URL(e.request.url).pathname.startsWith(PDF_ROUTE)){e.respondWith(localPdfResponse(e.request));return}if(e.request.method!=='GET'||new URL(e.request.url).origin!==self.location.origin)return;if(e.request.mode==='navigate'){e.respondWith(fetch(e.request).catch(()=>caches.match('./index.html')));return}e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))});
+self.addEventListener('fetch',e=>{
+ const req=e.request,url=new URL(req.url);
+ if((req.method==='GET'||req.method==='HEAD')&&url.pathname.startsWith(PDF_ROUTE)){e.respondWith(localPdfResponse(req));return}
+ if(req.method!=='GET'||url.origin!==self.location.origin)return;
+ if(req.mode==='navigate'){
+   e.respondWith(fetch(new Request(req,{cache:'no-store'})).catch(()=>caches.match('./index.html')));return;
+ }
+ if(/\.(js|css)$/i.test(url.pathname)||url.pathname.endsWith('/version.json')){
+  e.respondWith((async()=>{
+   try{const r=await fetch(new Request(req,{cache:'no-store'}));if(r.ok&&/\.(js|css)$/i.test(url.pathname)){const c=await caches.open(CACHE);await c.put(req,r.clone())}return r}
+   catch(err){return (await caches.match(req))||(await caches.match(req,{ignoreSearch:true}))||Response.error()}
+  })());return;
+ }
+ e.respondWith(caches.match(req).then(r=>r||fetch(req)));
+});
