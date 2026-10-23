@@ -1,0 +1,104 @@
+/* V1.9.7.14 – inventory category-first, thumb-friendly, local 3D artwork */
+#lager2-root{color:#eef8fa;max-width:850px;padding-bottom:calc(115px + env(safe-area-inset-bottom));font-family:inherit}
+#lager2-root .l3-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:14px 0 15px}
+#lager2-root .l3-title{display:flex;align-items:center;gap:9px;min-width:0}
+#lager2-root .l3-heading-icon{width:57px;height:57px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 5px 8px #0008)}
+#lager2-root .l3-title h1{font-size:clamp(21px,5vw,29px);font-weight:800;margin:0;line-height:1.12}
+#lager2-root .l3-title small{display:block;margin-top:5px;font-size:clamp(10px,2.5vw,12px);color:#abc6c8;white-space:nowrap}
+#lager2-root button.l3-new{min-height:51px;min-width:129px;flex-shrink:0;padding:9px 12px;border-radius:15px;border:1px solid #4bffbc;background:linear-gradient(168deg,#13dda0,#068657 58%,#075338);box-shadow:inset 0 2px 1px #ffffff80,inset 0 -3px 5px #033c31,0 0 18px #03d08a2c,0 5px 12px #0007;color:#fff;font-weight:800;font-size:clamp(12px,3vw,15px)}
+#lager2-root .l3-search-row{display:flex;gap:8px;align-items:stretch;margin-bottom:10px}
+#lager2-root .l3-search-frame{position:relative;flex:1;min-width:0}
+#lager2-root .l3-search-frame svg{position:absolute;left:13px;top:50%;width:23px;height:23px;transform:translateY(-50%);fill:none;stroke:#bfeaf0;stroke-width:2.3;stroke-linecap:round;pointer-events:none}
+#lager2-root input.l3-search{height:51px;margin:0;padding:11px 10px 11px 43px;background:#081c29;border-color:#357485;border-radius:14px;font-size:14px;box-shadow:inset 0 2px 6px #0006}
+#lager2-root input.l3-search:focus{outline:2px solid #36ffc0;outline-offset:1px}
+#lager2-root button.l3-filter-btn{width:52px;flex-shrink:0;font-size:28px;font-weight:600;color:#c4fff0;border:1px solid #3a8493;border-radius:14px;background:linear-gradient(155deg,#173644,#0d2331)}
+#lager2-root button.l3-filter-btn.active{border-color:#6ffec6;background:#167356}
+#lager2-root .l3-areas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:11px}
+#lager2-root .l3-area{min-width:0;display:flex;justify-content:center;align-items:center;gap:7px;min-height:48px;border:1px solid #356275;border-radius:12px;color:#e7f6fb;background:linear-gradient(145deg,#163747,#091d2b);font-size:clamp(11px,2.9vw,14px);font-weight:800;box-shadow:inset 0 1px #fff2}
+#lager2-root .l3-area span{font-size:20px;filter:drop-shadow(0 3px 2px #0009)}
+#lager2-root .l3-area.active{background:linear-gradient(165deg,#15c898,#087458);border-color:#55ffcc;color:white;box-shadow:inset 0 2px 2px #fffa,0 0 13px #22efb94a,0 5px 13px #0008}
+#lager2-root .l3-quick-row{display:grid;grid-template-columns:.65fr 1.2fr 1.48fr 1fr;gap:6px;margin-bottom:19px}
+#lager2-root .l3-quick{min-width:0;min-height:40px;display:flex;align-items:center;justify-content:center;gap:4px;padding:5px 4px;border:1px solid #365b69;border-radius:12px;color:#edf6f9;background:#0d2735;font-size:clamp(9px,2.6vw,12px);font-weight:700;white-space:nowrap}
+#lager2-root .l3-quick span{font-size:15px}
+#lager2-root .l3-quick.active{border-color:#53faca;background:linear-gradient(160deg,#18c18d,#037456);box-shadow:inset 0 2px 1px #ffffff44,0 0 11px #00ffa51c}
+#lager2-root .l3-filter-panel{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:#112b37;border:1px solid #387179;border-radius:14px;margin:0 0 16px;padding:10px}
+#lager2-root .l3-filter-panel span{color:#b0d5d8;font-size:12px}
+#lager2-root .l3-filter-panel .l2-btn{min-height:38px}
+#lager2-root .l3-section-title{display:flex;justify-content:space-between;align-items:center;gap:7px;margin:15px 0 10px;min-width:0}
+#lager2-root .l3-section-title>div{display:flex;align-items:center;gap:7px;min-width:0}
+#lager2-root .l3-section-title h2{font-size:clamp(18px,4.7vw,23px);margin:0;color:white;overflow-wrap:anywhere;min-width:0}
+#lager2-root .l3-section-title h2 small{font-weight:400;font-size:14px;color:#aedac9}
+#lager2-root .l3-section-title>.l2-btn,#lager2-root .l3-section-title>div>.l2-btn{flex-shrink:0;border:none;background:transparent;color:#a6ffd9;font-size:12px;padding:8px 5px}
+#lager2-root .l3-category-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#lager2-root .l3-category{min-height:86px;display:flex;align-items:center;gap:4px;padding:6px 8px 6px 2px;min-width:0;background:linear-gradient(160deg,#122e3c,#091e2d);border:1px solid #318478;border-radius:14px;text-align:left;color:#f4fffe;box-shadow:inset 0 1px 0 #b1e9e61c,0 4px 8px #0005}
+#lager2-root .l3-category:active{transform:scale(.985)}
+#lager2-root .l3-category:focus-visible{outline:2px solid #91ffd7;outline-offset:1px}
+#lager2-root .l3-category .l3-icon{width:clamp(61px,17vw,83px);height:75px;flex-shrink:0;object-fit:contain;filter:drop-shadow(0 5px 6px #0008)}
+#lager2-root .l3-category-txt{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+#lager2-root .l3-category-txt b{font-size:clamp(11px,2.9vw,14px);line-height:1.2;overflow-wrap:anywhere}
+#lager2-root .l3-category-txt small{font-size:clamp(10px,2.6vw,12px);color:#a0c7c6}
+#lager2-root .l3-chevron{font-size:24px;color:#72cdb6;flex-shrink:0}
+#lager2-root .l3-recent{margin-top:20px}
+#lager2-root .l3-recent-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+#lager2-root .l3-recent-item{min-width:0;border:1px solid #365f6e;border-radius:12px;padding:5px;background:#102a37;color:white}
+#lager2-root .l3-recent-photo{display:grid;place-items:center;width:100%;height:clamp(63px,18vw,99px);border:none;background:#091d27;border-radius:9px;overflow:hidden;padding:0}
+#lager2-root .l3-recent-photo img{width:100%;height:100%;object-fit:cover}
+#lager2-root .l3-recent-photo .l3-icon{width:90%;height:95%;object-fit:contain}
+#lager2-root .l3-recent-name{display:block;text-align:left;width:100%;background:transparent;border:none;color:white;padding:5px 0 1px}
+#lager2-root .l3-recent-name b{display:block;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#lager2-root .l3-recent-name small{font-size:10px;color:#aad3cf}
+#lager2-root .l3-status{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:21px}
+#lager2-root .l3-status button{min-width:0;padding:9px 4px;color:white;background:linear-gradient(160deg,#113240,#091925);border:1px solid #276e73;border-radius:12px;text-align:center;min-height:68px}
+#lager2-root .l3-status button:nth-child(2){border-color:#885a57}#lager2-root .l3-status button:nth-child(3){border-color:#8e5b4f}#lager2-root .l3-status button:nth-child(4){border-color:#897443}
+#lager2-root .l3-status span{display:block;font-size:clamp(9px,2.45vw,12px);white-space:nowrap}
+#lager2-root .l3-status b{display:block;font-size:23px;line-height:1.5;color:#fafffb}
+#lager2-root .l3-article-list{display:flex;flex-direction:column;gap:7px}
+#lager2-root .l3-article{display:flex;align-items:center;gap:7px;min-height:75px;padding:5px 6px;border:1px solid #35596b;border-radius:13px;background:linear-gradient(150deg,#122d3b,#0a1b28);box-shadow:inset 0 1px 0 #fff1;color:white}
+#lager2-root .l3-photo{border:0;background:#09222b;display:grid;place-items:center;flex-shrink:0;width:60px;height:60px;border-radius:9px;padding:0;overflow:hidden}
+#lager2-root .l3-photo img{width:100%;height:100%;object-fit:cover}
+#lager2-root .l3-photo img.l3-thumb{object-fit:contain}
+#lager2-root .l3-article-main{flex:1;min-width:0;background:transparent;color:white;border:0;display:flex;flex-direction:column;gap:4px;padding:0;text-align:left}
+#lager2-root .l3-article-main b{font-size:clamp(12px,3.3vw,15px);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+#lager2-root .l3-article-main small{font-size:clamp(9px,2.65vw,12px);white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:100%}
+#lager2-root .l3-amount{color:#f8ffff;font-size:clamp(11px,3vw,14px);font-weight:800}
+#lager2-root .l3-warning{color:#ffcf6b!important}
+#lager2-root .l3-article-qty{display:flex;gap:5px;flex-shrink:0}
+#lager2-root .l3-qtybtn{min-width:35px;height:42px;background:linear-gradient(145deg,#184e4a,#0b2c34);border:1px solid #45bf9a;border-radius:10px;color:white;font-size:24px;line-height:1;font-weight:600;box-shadow:inset 0 1px 0 #ffffff30,0 3px 5px #0004}
+#lager2-root .l3-open{flex-shrink:0;background:transparent;border:0;color:#a8e6d4;font-size:25px;width:15px;padding:0}
+#lager2-root .l3-grid-photo{display:block;width:100%;height:99px;object-fit:contain}
+#lager2-root .l3-grid-title{display:block;text-align:left;border:0;background:transparent;font-size:14px;font-weight:800;color:white;overflow-wrap:anywhere;padding:5px 0}
+#lager2-root .l3-quantity{font-size:14px;color:#bcffe4}
+#lager2-root .l3-grid-actions{display:flex;gap:5px;align-items:center}
+#lager2-root .l3-grid-actions .l2-btn{flex:1}
+#lager2-root .l3-empty{padding:28px 16px;text-align:center;border:1px dashed #4b8790;border-radius:17px;color:#c5e5e4}
+#lager2-root .l3-subfilters{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 15px}
+#lager2-root .l3-subfilters>.l2-btn{min-height:40px}
+#lager2-root .l3-maintenance{margin-top:19px;color:#c7e5df;border:1px solid #294f5c;border-radius:13px;background:#0c222e}
+#lager2-root .l3-maintenance>summary{padding:14px;font-size:12px;cursor:pointer;font-weight:700}
+#lager2-root .l3-maintenance-grid{padding:0 10px 12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+#lager2-root .l3-maintenance-grid .l2-btn{min-height:44px;overflow-wrap:anywhere}
+#lager2-root .l2-dialog{background:linear-gradient(140deg,#112a30,#09202b);max-height:min(92dvh,850px);overflow-y:auto;overflow-x:hidden}
+#lager2-root .l2-dialog .l2-row{flex-wrap:wrap}
+#lager2-root .l2-dialog>.l2-row .l2-btn,#lager2-root .l2-dialog .l2-row>.l2-btn{min-height:42px;max-width:100%;overflow-wrap:anywhere}
+#lager2-root .l2-dialog .l2-row:has(>button){align-items:center}
+#lager2-root .l2-dialog .l2-photos button{touch-action:manipulation}
+#lager2-root .l2-detail-gallery{overflow-x:auto;flex-wrap:nowrap}
+#lager2-root .l3-maintenance button{min-height:44px}
+#lager2-root .l3-result-title{margin:18px 0 13px}
+/* Shared soft 3D pictograms across navigation and key app areas. */
+body.premium-v192 .nav.nav1976 button i img{width:57%;height:57%;object-fit:contain;filter:drop-shadow(0 3px 1px rgba(0,0,0,.65)) drop-shadow(0 0 4px #ffffff45)}
+body.premium-v192 .nav.nav1976 button.active i img{filter:drop-shadow(0 2px 2px #0019) drop-shadow(0 0 6px #fff7)}
+.mr3d-app-icon{width:28px;height:28px;object-fit:contain;vertical-align:middle;filter:drop-shadow(0 3px 5px #0008);flex-shrink:0}
+.mr3d-heading{display:inline-flex;align-items:center;gap:9px}
+.dash1978-tile .mr3d-app-icon{width:31px;height:31px;margin-right:5px;vertical-align:middle}
+#lager2-root .l3-new:focus-visible,#lager2-root button:focus-visible{outline:2px solid #8effd8;outline-offset:2px}
+@media(max-width:390px){#lager2-root .l3-category{gap:0;padding-right:5px}#lager2-root .l3-category .l3-icon{width:clamp(53px,17vw,68px);height:70px}#lager2-root .l3-category-txt b{font-size:11px}#lager2-root .l3-article{gap:5px}#lager2-root .l3-photo{width:53px;height:56px}#lager2-root .l3-qtybtn{min-width:32px;height:39px}#lager2-root .l3-article-qty{gap:3px}#lager2-root .l3-open{width:10px}#lager2-root .l3-title small{white-space:normal}}
+@media(min-width:600px){#lager2-root .l3-category-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#lager2-root .l3-category .l3-icon{width:90px}}
+@media(prefers-reduced-motion:reduce){#lager2-root .l3-category:active{transform:none}}
+
+/* Fotoaufnahme liegt in der Schnell-Erfassung jetzt direkt oben. */
+#lager2-root .l3-photo-first{margin:12px 0;padding:11px;background:#0d2b36;border:1px solid #367f79;border-radius:13px}
+#lager2-root .l3-photo-first>label{margin:0 0 8px;font-weight:700}
+#lager2-root .l3-photo-first .l2-actions{margin:0 0 8px}
+#lager2-root .l3-photo-first .l2-actions .l2-btn{min-height:45px;background:#166149}
+#lager2-root .l3-photo-first .l2-photobox{min-width:115px}
