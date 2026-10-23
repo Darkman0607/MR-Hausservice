@@ -1,6 +1,6 @@
 {
-  "version": "0.1.9.5",
+  "version": "0.1.9.6",
   "released": "2026-10-23",
-  "notes": "Bugfix: Passwortlose Datenbank mit zufälligem Schlüssel; Migration früherer Daten, kompatible Gesamtsicherung.",
-  "build": 19
+  "notes": "Nahtlose Integration in MR-Hausservice; leere Alttresore ohne Passwort umstellen; Bestandsdaten nur nach einmaligem Entsperren migrieren.",
+  "build": 20
 }

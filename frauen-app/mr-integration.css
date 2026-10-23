@@ -24,3 +24,17 @@ body.mr-embedded{background:#0b1822;color:#f3e8f0}
 .mr-embedded .lb-card,.mr-embedded .lb-body{background:#12232d}.mr-embedded .lb-head,.mr-embedded .lb-caption{background:#29263a;color:#ffe1f2;border-color:#6c566e}
 .mr-embedded .day.active{background:#ad5380}.mr-embedded .entries-count-bar,.mr-embedded .selected-day-header{background:#1e2c36;border-color:#72556d}
 .mr-embedded .medical-figure img{background:#faf8fa;border-radius:12px}
+
+/* MR-Hausservice V1.9.9.0 – nur eingebettete Version ohne doppelte App-Hülle */
+body.mr-embedded.mr-integrated{margin:0!important;background:transparent!important;color:#f6e8f2;overflow-x:hidden}
+body.mr-embedded.mr-integrated .shell{min-height:0!important;max-width:none!important;width:100%!important;margin:0!important;padding:0!important;background:transparent!important;box-shadow:none!important;border:0!important;overflow:visible!important}
+body.mr-embedded.mr-integrated .shell>header,body.mr-embedded.mr-integrated .shell>#nav{display:none!important}
+body.mr-embedded.mr-integrated #view{padding:2px 0 15px!important;max-width:none!important;margin:0!important;min-height:0!important;overflow:visible!important}
+body.mr-embedded.mr-integrated #view>.hero,body.mr-embedded.mr-integrated #view>.dashboard-hero{margin-top:0!important;border-radius:18px;background:linear-gradient(135deg,#41273f,#213440)!important;border:1px solid #7b5d79!important}
+body.mr-embedded.mr-integrated #view h1{font-family:system-ui,sans-serif!important;font-size:clamp(20px,5vw,26px)!important;line-height:1.28!important}
+body.mr-embedded.mr-integrated #view h2{font-family:system-ui,sans-serif!important;font-size:clamp(17px,4vw,22px)!important;line-height:1.35!important}
+body.mr-embedded.mr-integrated #view .card,body.mr-embedded.mr-integrated #view .tile,body.mr-embedded.mr-integrated #view .feature-tile,body.mr-embedded.mr-integrated #view details{border-radius:16px!important}
+body.mr-embedded.mr-integrated input,body.mr-embedded.mr-integrated textarea,body.mr-embedded.mr-integrated select{max-width:100%;font-size:16px!important}
+body.mr-embedded.mr-integrated #toast{bottom:22px}
+body.mr-embedded.mr-integrated #lightbox{position:fixed;max-width:100vw;max-height:100dvh}
+@media(max-width:390px){body.mr-embedded.mr-integrated #view{padding:0 0 12px!important}body.mr-embedded.mr-integrated #view .card{padding:13px!important}}

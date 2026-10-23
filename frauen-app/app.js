@@ -1,5 +1,7 @@
 'use strict';
-const APP_VERSION='0.1.9.5', APP_BUILD=19, DB='frauen-app-beta', DB_VERSION=2;
+const APP_VERSION='0.1.9.6', APP_BUILD=20, DB='frauen-app-beta', DB_VERSION=2;
+const MR_EMBEDDED = new URLSearchParams(location.search).get('mr-integriert') === '1' && window.parent!==window;
+if(MR_EMBEDDED)document.body.classList.add('mr-integrated');
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const categories=['Periode','Zwischenblutung','Ausfluss','Flüssigkeitsverlust','Sexualität','Kinderwunsch','Zervixschleim / Eisprung','Basaltemperatur','Schwangerschaftstest','Schmerzen','Brustveränderung','Vulva / Scheide','WC / Ausscheidung','Wohlbefinden','Schwangerschaft','Kindsbewegungen / Wehen','Frauenarzttermin','Abstrich / Laboruntersuchung','Geburt / Wochenbett','Gemeinsame Selbstkontrolle','Krankheit / Allgemeinsymptome'];
 const categoryIcons = {
@@ -60,7 +62,7 @@ async function migrateCurrentVaultToAuto(){const clearEntries=await all('entries
 function requestDataPassword(isNew, initialError=""){
  return new Promise((resolve,reject)=>{
   const v=$('view');
-  v.innerHTML=`<section class="card" style="max-width:540px;margin:20px auto;padding:24px"><h2>${isNew?'Lokale Verschlüsselung einrichten':'Gesundheitsdaten entsperren'}</h2><p class="muted">${isNew?'Erstelle jetzt ein Datenpasswort mit mindestens 12 Zeichen. Dieses Passwort wird zum Öffnen deiner verschlüsselten Daten benötigt. Es ist keine Handy-PIN.':'Gib dein bereits festgelegtes Datenpasswort ein. Ein neues Passwort würde vorhandene Daten nicht entschlüsseln.'}</p><form id="data-password-form"><label for="data-password">${isNew?'Neues Datenpasswort':'Datenpasswort'}</label><input id="data-password" name="password" type="password" minlength="${isNew?12:1}" autocomplete="${isNew?'new-password':'current-password'}" required style="width:100%;box-sizing:border-box;font:inherit;padding:12px;margin:8px 0 18px"><div id="data-password-confirm-box" style="display:${isNew?'block':'none'}"><label for="data-password-confirm">Datenpasswort wiederholen</label><input id="data-password-confirm" name="confirmation" type="password" minlength="12" autocomplete="new-password" style="width:100%;box-sizing:border-box;font:inherit;padding:12px;margin:8px 0 18px" ${isNew?'required':''}></div><p id="data-password-error" role="alert" style="color:#9c2649;min-height:1.5em"></p><button class="primary" type="submit">${isNew?'Verschlüsselung aktivieren':'Daten entsperren'}</button></form><p class="footnote">Wichtig: Passwort sicher außerhalb der App aufbewahren. Ohne es sind die verschlüsselten Daten nicht lesbar. Browser- oder App-Daten nicht löschen.</p></section>`;
+  v.innerHTML=`<section class="card" style="max-width:540px;margin:20px auto;padding:24px"><h2>${isNew?'Lokale Verschlüsselung einrichten':'Einmalige Übernahme vorhandener Gesundheitsdaten'}</h2><p class="muted">${isNew?'Erstelle jetzt ein Datenpasswort mit mindestens 12 Zeichen. Dieses Passwort wird zum Öffnen deiner verschlüsselten Daten benötigt. Es ist keine Handy-PIN.':'Nur für die einmalige Übernahme der bereits verschlüsselten Einträge: Gib das bisherige Datenpasswort ein. Nach erfolgreicher Übernahme wird es nicht mehr abgefragt. Ohne dieses Passwort können bestehende Einträge nicht entschlüsselt werden.'}</p><form id="data-password-form"><label for="data-password">${isNew?'Neues Datenpasswort':'Datenpasswort'}</label><input id="data-password" name="password" type="password" minlength="${isNew?12:1}" autocomplete="${isNew?'new-password':'current-password'}" required style="width:100%;box-sizing:border-box;font:inherit;padding:12px;margin:8px 0 18px"><div id="data-password-confirm-box" style="display:${isNew?'block':'none'}"><label for="data-password-confirm">Datenpasswort wiederholen</label><input id="data-password-confirm" name="confirmation" type="password" minlength="12" autocomplete="new-password" style="width:100%;box-sizing:border-box;font:inherit;padding:12px;margin:8px 0 18px" ${isNew?'required':''}></div><p id="data-password-error" role="alert" style="color:#9c2649;min-height:1.5em"></p><button class="primary" type="submit">${isNew?'Verschlüsselung aktivieren':'Alte Einträge übernehmen'}</button></form><p class="footnote">Bei vorhandenen Alt-Daten ist die Übernahme einmalig. Deine gespeicherten Einträge bleiben bis zur erfolgreichen Umstellung unangetastet. Bitte keine Website-Daten löschen.</p></section>`;
   const form=$('data-password-form'),error=$('data-password-error');error.textContent=initialError;
   form.addEventListener('submit',event=>{event.preventDefault();const pass=$('data-password').value,confirmPass=isNew?$('data-password-confirm').value:pass;if(isNew&&pass.length<12){error.textContent='Bitte mindestens 12 Zeichen eingeben.';return;}if(isNew&&pass!==confirmPass){error.textContent='Die Passwörter stimmen nicht überein.';return;}form.querySelector('button').disabled=true;resolve(pass);},{once:false});
  });
@@ -79,6 +81,10 @@ async function unlockLocal(){
    dataKey=old;await migrateCurrentVaultToAuto();return;
  }
  if(meta){
+   // Ein alter Passwort-Prüfwert ohne Einträge/Fotos darf in einen passwortlosen leeren Tresor umgewandelt werden.
+   // Mit echten Einträgen ist die einmalige Entschlüsselung durch das bisherige Passwort zwingend notwendig.
+   const [existingEntries,existingPhotos]=await Promise.all([readRaw('entries'),readRaw('photos')]);
+   if(existingEntries.length===0&&existingPhotos.length===0){await writeAutoProtectedData([],[]);return;}
    let promptError='';
    for(;;){
      const pass=await requestDataPassword(false,promptError||'Einmalig das bisherige Passwort eingeben. Danach wird die Passwortabfrage entfernt.');
@@ -1042,6 +1048,7 @@ async function checkUpdate(silent=false){
     }
    }catch(e){}
    const next=new URL('./index.html',location.href);
+   if(MR_EMBEDDED)next.searchParams.set('mr-integriert','1');
    next.searchParams.set('app_update',info.version+'-'+build);
    next.searchParams.set('t',String(Date.now()));
    location.replace(next.href);
@@ -1060,5 +1067,23 @@ window.addEventListener('message',event=>{if(window.parent===window||event.sourc
  const target=event.data.target;if(!MR_ALLOWED_PAGES.has(target))return;
  if(!dataKey){mrQueuedPage=target;return}goto(target).catch(e=>console.warn('Frauen-App Navigation:',e));
 });
-async function init(){try{db=await openDB();await unlockLocal();$('update').onclick=()=>checkUpdate();$('version').textContent='v'+APP_VERSION;await render();if(mrQueuedPage){const dest=mrQueuedPage;mrQueuedPage=null;await goto(dest)}if(!location.search.includes('mr-integriert=1') && 'serviceWorker' in navigator && location.protocol==='https:'){navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(()=>{navigator.serviceWorker.addEventListener('controllerchange',()=>{/* App navigiert nach eigener Versionsprüfung; kein zweites Neuladen */})}).catch(()=>{});}setTimeout(()=>checkUpdate(true),2000);setInterval(()=>checkUpdate(true),5*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate(true)})}catch(err){const message=err?.message||'Unbekannter Fehler';const recoverable=/Mindestens 12 Zeichen|Passwörter stimmen nicht|Entsperren abgebrochen|Einrichtung abgebrochen|Datenpasswort falsch/.test(message);$('view').innerHTML='<div class="card"><h2>Lokale Daten '+(recoverable?'noch gesperrt':'nicht verfügbar')+'</h2><div class="warning">'+esc(message)+'</div><p class="muted">'+(recoverable?'Deine vorhandenen Daten wurden dadurch nicht gelöscht. Wähle ein Datenpasswort mit mindestens 12 Zeichen und wiederhole die Eingabe.':'Bitte nicht die Website-Daten oder den Browsercache löschen. Falls du bereits ein Backup hast, bewahre es auf.')+'</p><button class="primary" id="retry-unlock">'+'Erneut versuchen'+'</button></div>';const retry=$('retry-unlock');if(retry)retry.onclick=()=>{retry.disabled=true;init()};}}
+function mrSendParentLayout(){
+ if(!MR_EMBEDDED)return;
+ const outer=document.querySelector('.shell');
+ const height=Math.max(300,Math.ceil(outer?.scrollHeight||document.body.scrollHeight)+4);
+ try{window.parent.postMessage({type:'mr-women-height',height},location.origin)}catch(e){}
+}
+if(MR_EMBEDDED){
+ let scheduled=false;
+ const schedule=()=>{if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;mrSendParentLayout()})};
+ window.addEventListener('load',schedule);window.addEventListener('resize',schedule);
+ document.addEventListener('click',()=>setTimeout(schedule,0));
+ const observe=()=>{
+  if(typeof ResizeObserver!=='undefined')new ResizeObserver(schedule).observe(document.querySelector('.shell'));
+  if(typeof MutationObserver!=='undefined')new MutationObserver(schedule).observe(document.getElementById('view'),{childList:true,subtree:true,attributes:true,characterData:true});
+  schedule();
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',observe,{once:true});else observe();
+}
+async function init(){try{db=await openDB();await unlockLocal();$('update').onclick=()=>checkUpdate();$('version').textContent='v'+APP_VERSION;await render();mrSendParentLayout();if(mrQueuedPage){const dest=mrQueuedPage;mrQueuedPage=null;await goto(dest);mrSendParentLayout()}if(!location.search.includes('mr-integriert=1') && 'serviceWorker' in navigator && location.protocol==='https:'){navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(()=>{navigator.serviceWorker.addEventListener('controllerchange',()=>{/* App navigiert nach eigener Versionsprüfung; kein zweites Neuladen */})}).catch(()=>{});}setTimeout(()=>checkUpdate(true),2000);setInterval(()=>checkUpdate(true),5*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate(true)})}catch(err){const message=err?.message||'Unbekannter Fehler';const recoverable=/Mindestens 12 Zeichen|Passwörter stimmen nicht|Entsperren abgebrochen|Einrichtung abgebrochen|Datenpasswort falsch/.test(message);$('view').innerHTML='<div class="card"><h2>Lokale Daten '+(recoverable?'noch gesperrt':'nicht verfügbar')+'</h2><div class="warning">'+esc(message)+'</div><p class="muted">'+(recoverable?'Deine vorhandenen Daten wurden dadurch nicht gelöscht. Wähle ein Datenpasswort mit mindestens 12 Zeichen und wiederhole die Eingabe.':'Bitte nicht die Website-Daten oder den Browsercache löschen. Falls du bereits ein Backup hast, bewahre es auf.')+'</p><button class="primary" id="retry-unlock">'+'Erneut versuchen'+'</button></div>';const retry=$('retry-unlock');if(retry)retry.onclick=()=>{retry.disabled=true;init()};}}
 init();

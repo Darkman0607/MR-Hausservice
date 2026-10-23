@@ -1,7 +1,9 @@
-# MR-Hausservice 1.9.8.9
+# MR-Hausservice V1.9.9.0 – Frauen-Gesundheit
 
-- Haushalts-Feinschliff: Banner, drei Symbol-Kennzahlen, neu gestaltete 7 Navigationskacheln, farbigere Aktionskarten, kompakte Statistiken und bessere Handy-Abstände.
-- Die sieben Kacheln verwenden hochauflösende systemeigene Symbolgrafiken (Darstellung abhängig vom Gerät); die bisherigen Banner- und Aktionsmotive bleiben erhalten.
-- Alle bestehenden Datenstrukturen und Funktionen bleiben unverändert.
-
-**Wichtig:** ZIP enthält den vollständigen Website-Code, jedoch nicht die lokal gespeicherten App-Daten. Vor Aktualisierung Gesamtsicherung in der App exportieren.
+- Gesundheit als eigenständiger Hauptbereich in der MR-App mit nahtlosem Design und sechs Modultasten.
+- Doppelte Kopfzeile und zweite Navigationsleiste der eingebetteten Frauen-App entfallen.
+- Der Inhalt bleibt unverändert erhalten; die eingebettete Ansicht wächst passend zur Inhaltshöhe.
+- Passwortfreie automatische Freigabe bei neuen/umgestellten Tresoren. Leere Alttresore werden ohne Eingabe umgestellt.
+- **Wichtig:** Bei bereits verschlüsselten persönlichen Gesundheitsdaten muss das bisherige Passwort genau einmal eingegeben werden, um die Daten verlustfrei zu migrieren. Danach keine Passwortabfrage mehr. Ein automatischer Zugriff ohne Schlüssel ist technisch unmöglich.
+- Backups mit dem lokalen Entschlüsselungsschlüssel sind hochsensibel; nicht in öffentliche Repositories hochladen.
+- Vor dem Update eine Gesamtsicherung aus der App exportieren, und keine Website-Daten löschen.

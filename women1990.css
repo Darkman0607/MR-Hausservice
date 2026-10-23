@@ -1,0 +1,24 @@
+/* MR-Hausservice V1.9.9.0 · Frauen-Gesundheit nahtlos */
+body.premium-v192 #mrp-women{padding-top:6px;padding-bottom:115px;overflow:visible}
+body.premium-v192 #mrp-women .mrw-new-hero{position:relative;overflow:hidden;border:1px solid #8a5076;border-radius:23px;background:radial-gradient(circle at 92% 5%,#5f285f 0%,transparent 55%),linear-gradient(117deg,#302137 0%,#1b2738 55%,#0d2930);box-shadow:0 12px 26px #0006,inset 0 1px #ffc9e43c;padding:19px 16px 15px;margin-bottom:16px}
+body.premium-v192 #mrp-women .mrw-new-hero:after{content:'';position:absolute;right:-45px;top:-85px;width:190px;height:190px;border-radius:50%;border:1px solid #c97ba98a;box-shadow:0 0 45px #cd6baa3a;pointer-events:none}
+body.premium-v192 #mrp-women .mrw-overline{font:800 10px/1.2 system-ui;letter-spacing:1.4px;color:#f3add3}
+body.premium-v192 #mrp-women .mrw-spark{color:#ff9ecf;font-size:15px}
+body.premium-v192 #mrp-women .mrw-hero-main{display:flex;align-items:center;gap:13px;margin:15px 0 17px}
+body.premium-v192 #mrp-women .mrw-hero-symbol{display:grid;flex:0 0 62px;place-items:center;width:62px;height:62px;border:1px solid #8d5f88;border-radius:19px;background:linear-gradient(140deg,#5e3154,#1f3441);box-shadow:0 9px 19px #0005}
+body.premium-v192 #mrp-women .mrw-hero-symbol img{width:51px;height:51px;object-fit:contain}
+body.premium-v192 #mrp-women .mrw-hero-main h1{font:850 clamp(21px,5.6vw,29px)/1.15 system-ui!important;letter-spacing:-.7px;margin:0 0 7px!important;color:#fff!important}
+body.premium-v192 #mrp-women .mrw-hero-main p{font:500 12px/1.4 system-ui;margin:0;color:#dac6d6}
+body.premium-v192 #mrp-women .mrw-hero-foot{display:flex;gap:6px;flex-wrap:wrap}
+body.premium-v192 #mrp-women .mrw-hero-foot span{border:1px solid #7e53785c;background:#452e456e;color:#ebc5db;border-radius:30px;padding:6px 9px;font:650 10px system-ui}
+body.premium-v192 #mrp-women .mrw-section-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 16px;padding:0;background:none;border:0;box-shadow:none;position:static}
+body.premium-v192 #mrp-women .mrw-section-tabs button{display:flex;gap:6px;align-items:center;justify-content:center;min-height:55px;padding:8px 4px;border-radius:14px;border:1px solid #635069;background:linear-gradient(145deg,#272438,#152632);font:730 11px/1.25 system-ui;color:#f1dcea;text-align:center;white-space:normal;box-shadow:inset 0 1px #ffe8f316;touch-action:manipulation}
+body.premium-v192 #mrp-women .mrw-section-tabs button span{font:700 19px/1 system-ui;color:#f4a0c6}
+body.premium-v192 #mrp-women .mrw-section-tabs button.active{background:linear-gradient(130deg,#ac5786,#773f78);border-color:#fcb6df;box-shadow:0 0 0 1px #ce8cbd5c,0 0 17px #de7ab855;color:white}
+body.premium-v192 #mrp-women .mrw-section-tabs button.active span{color:#fff}
+body.premium-v192 #mrp-women .mrw-integrated-content{border:0!important;border-radius:0!important;background:transparent!important;overflow:visible!important;box-shadow:none!important;margin:0!important;padding:0!important}
+body.premium-v192 #mrp-women #mrw-frame{width:100%!important;min-height:380px;height:500px;border:0!important;border-radius:0!important;display:block;background:transparent!important;overflow:hidden!important}
+body.premium-v192 #mrp-women .mrw-privacy-details{margin:8px 0 26px;padding:13px;border:1px solid #504258;border-radius:14px;background:#142631;color:#baabba;font:450 12px/1.6 system-ui}
+body.premium-v192 #mrp-women .mrw-privacy-details summary{cursor:pointer;font:750 12px system-ui;color:#f4c5df}
+body.premium-v192 #mrp-women .mrw-privacy-details button{background:#3b2a43;color:#ffe4f4;border:1px solid #8e6385;border-radius:11px;padding:10px;font:700 12px system-ui}
+@media(max-width:370px){body.premium-v192 #mrp-women .mrw-section-tabs{gap:6px}body.premium-v192 #mrp-women .mrw-section-tabs button{font-size:10px;min-height:52px}body.premium-v192 #mrp-women .mrw-hero-main{gap:9px}body.premium-v192 #mrp-women .mrw-hero-symbol{width:52px;height:52px;flex-basis:52px}body.premium-v192 #mrp-women .mrw-hero-symbol img{width:43px;height:43px}}
