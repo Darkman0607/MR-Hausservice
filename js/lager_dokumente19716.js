@@ -4,12 +4,12 @@
 const escDoc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const types={file:'📎 Datei',note:'📝 Notiz',link:'🔗 Link',checklist:'☑ Checkliste'};
 const categories=['Bedienungsanleitung','Wartung & Pflege','Reparatur / Ersatzteile','Sicherheitsdatenblatt','Anleitung / Infoblatt','Sonstiges'];
-const state={articleId:null,page:'list',selected:null,busy:false,previewUrl:null};
+const state={articleId:null,page:'list',selected:null,busy:false,previewUrl:null,previewBlob:null,previewBlobId:null};
 let overlay;
 const article=()=>db.stock.find(x=>String(x.id)===String(state.articleId));
 const docs=()=>Array.isArray(article()?.l2documents)?article().l2documents:[];
 const selected=()=>docs().find(d=>d.id===state.selected);
-function closePreview(){if(state.previewUrl){URL.revokeObjectURL(state.previewUrl);state.previewUrl=null}}
+function closePreview(){if(state.previewUrl){URL.revokeObjectURL(state.previewUrl);state.previewUrl=null}state.previewBlob=null;state.previewBlobId=null}
 function close(){closePreview();state.articleId=null;state.page='list';state.selected=null;if(overlay)overlay.hidden=true;if(typeof render==='function')render()}
 function notify(msg,err=false){const el=overlay?.querySelector('#mrdoc-notice');if(el){el.textContent=msg;el.classList.toggle('error',err)}else if(err)alert(msg)}
 function textRow(label,value){return value?`<div class="mrdoc-description"><strong>${escDoc(label)}:</strong> ${escDoc(value)}</div>`:''}
@@ -61,16 +61,69 @@ async function handleSubmit(e){if(e.target.id!=='mrdoc-form')return;e.preventDef
 }
 async function handleChange(e){if(e.target.id==='mrdoc-type')return toggleType();const index=e.target.dataset?.mrdocCheck;if(index===undefined)return;const d=selected();if(!d||d.type!=='checklist')return;const old=!!d.items[Number(index)]?.done;d.items[Number(index)].done=!!e.target.checked;d.updatedAt=new Date().toISOString();if(!await save()){d.items[Number(index)].done=old;e.target.checked=old;notify('Checkliste konnte nicht gespeichert werden',true)}}
 function downloadBlob(blob,name){const link=document.createElement('a');const url=URL.createObjectURL(blob);link.href=url;link.download=name||'Dokument';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)}
-async function openFile(id,download){const d=docs().find(x=>x.id===id);if(!d||d.type!=='file')return;try{const blob=await mrDocsGet(id);if(!(blob instanceof Blob))throw Error('Datei nicht gefunden. Prüfe die Sicherung.');if(download){downloadBlob(blob,d.filename);return}
- closePreview();state.previewUrl=URL.createObjectURL(blob);const body=overlay.querySelector('.mrdoc-body');if(!body)return;
- const fileName=escDoc(d.filename||'Dokument');const url=escDoc(state.previewUrl);
- body.innerHTML=`<div class="mrdoc-toolbar">${btn('← Zurück','view:'+escDoc(id))}${btn('⬇ Herunterladen','fileDownload:'+escDoc(id))}</div><h3>${fileName}</h3>${d.mime.startsWith('image/')?`<img class="mrdoc-preview-img" src="${url}" alt="${fileName}">`:d.mime==='application/pdf'?`<p class="mrdoc-help">Falls das PDF auf deinem Handy hier nicht angezeigt wird, verwende „Herunterladen“.</p><iframe class="mrdoc-preview-pdf" title="${fileName}" src="${url}"></iframe>`:'<pre class="mrdoc-preview-text">Lade den Text, um ihn anzusehen.</pre>'}`;
- if(d.mime==='text/plain')body.querySelector('pre').textContent=await blob.text();
- }catch(error){notify('Dokument nicht geöffnet: '+error.message,true)}}
-async function handleClick(e){if(e.target===overlay){close();return}const control=e.target.closest('[data-mrdoc]');if(!control)return;const [op,...parts]=control.dataset.mrdoc.split(':');const id=parts.join(':');if(op==='close'){close();return}if(op==='new'){state.page='new';state.selected=null;closePreview();draw();return}if(op==='list'){closePreview();state.page='list';state.selected=null;draw();return}if(op==='view'||op==='edit'){closePreview();state.selected=id;state.page=op;draw();return}if(op==='fileOpen'||op==='fileDownload'){await openFile(id,op==='fileDownload');return}if(op==='linkOpen'){const d=docs().find(x=>x.id===id);try{const url=new URL(d?.url||'');if(url.protocol==='https:')window.open(url.href,'_blank','noopener,noreferrer');else notify('Dieser Link ist nicht sicher.',true)}catch(e){notify('Der Link ist ungültig.',true)}return}if(op==='delete'){
+function pdfUrl(id,filename){
+ // SW serves a named PDF file from IndexedDB on the same GitHub Pages origin.
+ // This avoids Android's UUID-labelled blob: iframe PDF placeholder.
+ return new URL('./__mrdoc/'+encodeURIComponent(String(id))+'/'+encodeURIComponent(filename||'Dokument.pdf'),location.href).href;
+}
+function inlinePDF(id){
+ const d=docs().find(x=>x.id===id&&x.type==='file'&&x.mime==='application/pdf');if(!d)return;
+ const body=overlay?.querySelector('.mrdoc-body');if(!body)return;
+ const previous=body.querySelector('.mrdoc-preview-pdf');if(previous){previous.remove();return}
+ const preview=document.createElement('iframe');preview.className='mrdoc-preview-pdf';preview.title=d.filename||'PDF-Dokument';preview.src=pdfUrl(id,d.filename);
+ body.appendChild(preview);
+ notify('Vorschau geöffnet. Falls dein Android-Browser weiterhin nur ein PDF-Symbol zeigt, verwende „PDF im Browser öffnen“ oder die PDF-App.');
+}
+function openBrowserPDF(id){
+ const d=docs().find(x=>x.id===id&&x.type==='file'&&x.mime==='application/pdf');if(!d)return;
+ const link=document.createElement('a');link.href=pdfUrl(id,d.filename);link.target='_blank';link.rel='noopener noreferrer';document.body.append(link);link.click();link.remove();
+ notify('PDF-Aufruf gestartet. Zeigt dein Browser die Datei nicht an, wähle „Mit PDF-App öffnen“ oder „Herunterladen“.');
+}
+function sharePDF(id){
+ const d=docs().find(x=>x.id===id&&x.type==='file'&&x.mime==='application/pdf');if(!d)return;
+ // No IndexedDB await before navigator.share(): Android requires transient user activation.
+ const blob=state.previewBlobId===id?state.previewBlob:null;
+ if(!(blob instanceof Blob)){notify('PDF zunächst über „Öffnen / Ansehen“ laden.',true);return}
+ const file=new File([blob],d.filename||'Dokument.pdf',{type:'application/pdf'});
+ if(typeof navigator.share!=='function'||(navigator.canShare&&!navigator.canShare({files:[file]}))){
+   downloadBlob(blob,d.filename||'Dokument.pdf');notify('Direktes Öffnen wird von diesem Browser nicht unterstützt. PDF gespeichert – öffne sie in „Dateien“ mit einer PDF-App.');return;
+ }
+ // Call synchronously inside the click, and deal with completion without blocking the click handler.
+ try{navigator.share({files:[file],title:d.title||'PDF-Dokument'}).catch(error=>{
+  if(error?.name==='AbortError')return;
+  notify('PDF konnte nicht übergeben werden: '+String(error?.message||'Fehler')+'. Alternativ „Herunterladen“ wählen.',true);
+ });}catch(error){notify('PDF konnte nicht übergeben werden: '+error.message+'. Alternativ „Herunterladen“ wählen.',true)}
+}
+async function openFile(id,download){
+ const d=docs().find(x=>x.id===id);if(!d||d.type!=='file')return;
+ try{
+  const blob=await mrDocsGet(id);if(!(blob instanceof Blob))throw Error('Datei nicht gefunden. Prüfe die Sicherung.');
+  if(download){downloadBlob(blob,d.filename);return}
+  closePreview();const body=overlay.querySelector('.mrdoc-body');if(!body)return;
+  const fileName=escDoc(d.filename||'Dokument');
+  if(d.mime==='application/pdf'){
+   state.previewBlob=blob;state.previewBlobId=id;
+   const android=/Android/i.test(navigator.userAgent);
+   const swInfo=(!('serviceWorker' in navigator)||!navigator.serviceWorker.controller)?'<p class="mrdoc-help">Hinweis: PDF im Browser benötigt eine aktive App-Verbindung. „Mit PDF-App öffnen“ oder „Herunterladen“ funktioniert unabhängig davon.</p>':'';
+   const extra=android?'':`<iframe class="mrdoc-preview-pdf" title="${fileName}" src="${escDoc(pdfUrl(id,d.filename))}"></iframe>`;
+   const btns=android
+    ?`${btn('📤 Mit PDF-App öffnen','pdfShare:'+escDoc(id),'main')}${btn('⬇ PDF herunterladen','fileDownload:'+escDoc(id))}${btn('📖 Im Browser versuchen','pdfBrowser:'+escDoc(id))}`
+    :`${btn('📖 PDF im Browser öffnen','pdfBrowser:'+escDoc(id),'main')}${btn('📤 Mit PDF-App öffnen','pdfShare:'+escDoc(id))}${btn('⬇ Herunterladen','fileDownload:'+escDoc(id))}`;
+   body.innerHTML=`<div class="mrdoc-toolbar">${btn('← Zurück','view:'+escDoc(id))}</div><h3>${fileName}</h3><p class="mrdoc-help">Die PDF ist im Lager gespeichert. Auf Android „Mit PDF-App öffnen“ wählen und eine geeignete App auswählen. Falls das nicht angeboten wird: herunterladen und über „Dateien“ öffnen.</p><div class="mrdoc-toolbar mrdoc-pdf-buttons">${btns}</div>${swInfo}${extra}`;
+   return;
+  }
+  state.previewUrl=URL.createObjectURL(blob);const url=escDoc(state.previewUrl);
+  body.innerHTML=`<div class="mrdoc-toolbar">${btn('← Zurück','view:'+escDoc(id))}${btn('⬇ Herunterladen','fileDownload:'+escDoc(id))}</div><h3>${fileName}</h3>${d.mime.startsWith('image/')?`<img class="mrdoc-preview-img" src="${url}" alt="${fileName}">`:'<pre class="mrdoc-preview-text"></pre>'}`;
+  if(d.mime==='text/plain')body.querySelector('pre').textContent=await blob.text();
+ }catch(error){notify('Dokument nicht geöffnet: '+error.message,true)}
+}
+async function handleClick(e){if(e.target===overlay){close();return}const control=e.target.closest('[data-mrdoc]');if(!control)return;const [op,...parts]=control.dataset.mrdoc.split(':');const id=parts.join(':');if(op==='close'){close();return}if(op==='new'){state.page='new';state.selected=null;closePreview();draw();return}if(op==='list'){closePreview();state.page='list';state.selected=null;draw();return}if(op==='view'||op==='edit'){closePreview();state.selected=id;state.page=op;draw();return}if(op==='fileOpen'||op==='fileDownload'){await openFile(id,op==='fileDownload');return}if(op==='pdfBrowser'){openBrowserPDF(id);return}if(op==='pdfInline'){inlinePDF(id);return}if(op==='pdfShare'){sharePDF(id);return}if(op==='linkOpen'){const d=docs().find(x=>x.id===id);try{const url=new URL(d?.url||'');if(url.protocol==='https:')window.open(url.href,'_blank','noopener,noreferrer');else notify('Dieser Link ist nicht sicher.',true)}catch(e){notify('Der Link ist ungültig.',true)}return}if(op==='delete'){
  const x=article(),d=x?.l2documents?.find(t=>t.id===id);if(!d)return;if(!confirm('„'+d.title+'“ samt verknüpfter Datei wirklich löschen?'))return;if(state.busy)return;state.busy=true;const old=[...x.l2documents];x.l2documents=x.l2documents.filter(t=>t.id!==id);
  try{await mrDocsCommitWithState([],d.type==='file'?[id]:[]);state.page='list';state.selected=null;closePreview();draw();notify('Eintrag gelöscht.')}catch(error){x.l2documents=old;notify('Löschen fehlgeschlagen: '+error.message,true)}finally{state.busy=false}
  }}
 window.MRLagerDokumente={open,close};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.articleId)close()});
 })();
+
+/* Active document-module marker, checked against index.html. */
+window.MR_DOC_BUILD="1.9.7.18";
