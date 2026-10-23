@@ -2,7 +2,7 @@
    Do not import commercial objects automatically; old backup and PDF paths stay intact. */
 (function(){
 'use strict';
-const VERSION='1.9.9.1';
+const VERSION='1.9.9.2';
 const types=['Objekt','Stockwerk / Bereich','Raum','Zone','Schrank','Lagerplatz'];
 const tabs=[['overview','Übersicht'],['places','Objekte & Räume'],['tasks','Putzpläne'],['clean','Reinigung'],['supplies','Material'],['devices','Geräte'],['reports','Statistik']];
 let tab='overview',editor=null,mode='business',booted=false;
@@ -51,10 +51,10 @@ function privateHome(){const h=state(),tasks=dueTasks(),suppliesLow=h.supplies.f
   {cls:'household',title:'Haushalt & Putzen',desc:'Räume, Pläne, Reinigung, Geräte',extra:`${h.places.length} Bereiche · ${tasks.length} fällig`,attrs:'data-mrp-action="open-household"'},
   {cls:'fridge',title:'Kühlschrank & Vorräte',desc:'Lebensmittel, Haltbarkeit, Lager',extra:'Planung vorbereitet',attrs:'data-mrp-action="planned"'},
   {cls:'shopping',title:'Einkaufen & Essen',desc:'Einkaufsliste und Einkaufsbudget',extra:'Einkauf planen',attrs:'data-mr91-shopping="1"'},
-  {cls:'finance',title:'Privatfinanzen',desc:'Einkauf, Budget, Einnahmen und Ausgaben',extra:'Finanzzentrale öffnen',attrs:'data-mrp-go="mrp-finance"'},
+  {cls:'finance',title:'Finanzen',desc:'Privat, Gewerbe, Einnahmen & Ausgaben',extra:'Gesamtfinanzen öffnen',attrs:'data-mrp-go="mrp-finance"'},
   {cls:'school',title:'Familie & Schule',desc:'Stundenplan, Hausaufgaben, Lernen',extra:'Planung vorbereitet',attrs:'data-mrp-action="planned"'},
   {cls:'reminder',title:'Termine & Erinnerungen',desc:'Kalender, Aufgaben, Geburtstage',extra:`${appointments} private Termine`,attrs:'data-mrp-go="mrp-today"'},
-  {cls:'vehicle',title:'Fahrzeuge',desc:'Wartung, Kosten, Termine',extra:'Planung vorbereitet',attrs:'data-mrp-action="planned"'},
+  {cls:'vehicle',title:'Fahrzeuge',desc:'Tanken, Kilometer, Service & Belege',extra:'Fahrzeugzentrale öffnen',attrs:'data-mrp-vehicle="1"'},
   {cls:'docs',title:'Dokumente & Verträge',desc:'Dateien, Verträge, Übersichten',extra:'Planung vorbereitet',attrs:'data-mrp-action="planned"'},
   {cls:'project',title:'Private Projekte',desc:'Ideen, Pläne, To-dos',extra:'Planung vorbereitet',attrs:'data-mrp-action="planned"'},
   {cls:'notes',title:'Notizen & Sonstiges',desc:'Notizen, Listen, Aufzeichnungen',extra:`${suppliesLow} Warnung(en)`,attrs:'data-mrp-action="planned"'}
