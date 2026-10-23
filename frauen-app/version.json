@@ -1,6 +1,6 @@
 {
-  "version": "0.1.9.3",
-  "released": "2026-10-22",
-  "notes": "Layout-Umbau: neue Dashboard-Startseite, moderne Kachelbereiche, übersichtlichere Selbstkontrolle, überarbeitete Frauenarztakte sowie visuelles Redesign bei gleicher Inhaltsbasis.",
-  "build": 17
+  "version": "0.1.9.4",
+  "released": "2026-10-23",
+  "notes": "Integration in MR-Hausservice: automatische lokale Freigabe ohne Passwortabfrage, gleiche Funktionen, Frauen-Bereich weiterhin privat in eigener Datenbank.",
+  "build": 18
 }

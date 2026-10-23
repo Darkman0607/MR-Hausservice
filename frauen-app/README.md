@@ -21,7 +21,7 @@ Update von 0.1.9.1 auf 0.1.9.2 (Build 16):
     - Alle vertieften Fachlektionen mit Schautafeln und Grundlagenlektionen exakt zu diesem Bereich.
 
 
-## Beta 0.1.9.3 – Layout Umbau
+## Beta 0.1.9.4 – Integration ohne Passwortabfrage
 - neue Dashboard-Startseite
 - schnelle Kategorie-Einträge
 - moderne Bereichs-Kacheln

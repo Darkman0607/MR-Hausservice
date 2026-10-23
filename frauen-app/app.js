@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION='0.1.9.3', APP_BUILD=17, DB='frauen-app-beta', DB_VERSION=2;
+const APP_VERSION='0.1.9.4', APP_BUILD=18, DB='frauen-app-beta', DB_VERSION=2;
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const categories=['Periode','Zwischenblutung','Ausfluss','Flüssigkeitsverlust','Sexualität','Kinderwunsch','Zervixschleim / Eisprung','Basaltemperatur','Schwangerschaftstest','Schmerzen','Brustveränderung','Vulva / Scheide','WC / Ausscheidung','Wohlbefinden','Schwangerschaft','Kindsbewegungen / Wehen','Frauenarzttermin','Abstrich / Laboruntersuchung','Geburt / Wochenbett','Gemeinsame Selbstkontrolle','Krankheit / Allgemeinsymptome'];
 const categoryIcons = {
@@ -31,6 +31,7 @@ let updatingNow=false,db,page='home',selectedTopic=null,selectedDay=[new Date().
 const lessons=COURSE_LESSONS;
 let dataKey=null;
 const SECURE_CHECK='frauen-app-local-v1';
+const AUTO_UNLOCK_PASS='mr-frauen-auto-local-2026-no-password';
 function openDB(){return new Promise((ok,no)=>{let r=indexedDB.open(DB,DB_VERSION);r.onupgradeneeded=()=>{let d=r.result;if(!d.objectStoreNames.contains('entries'))d.createObjectStore('entries',{keyPath:'id'});if(!d.objectStoreNames.contains('photos'))d.createObjectStore('photos',{keyPath:'id'});if(!d.objectStoreNames.contains('security'))d.createObjectStore('security',{keyPath:'id'});};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error);});}
 function readRaw(name){return new Promise((ok,no)=>{const tx=db.transaction(name,'readonly'),r=tx.objectStore(name).getAll();r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error);});}
 function readMeta(){return new Promise((ok,no)=>{const r=db.transaction('security','readonly').objectStore('security').get('local');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error);});}
@@ -43,6 +44,9 @@ async function unpackRecord(name,value){const data=await unseal(value);if(name==
 async function all(name){const rows=await readRaw(name);if(!dataKey)throw Error('Gesundheitsdaten sind gesperrt');return Promise.all(rows.map(x=>unpackRecord(name,x)));}
 async function put(name,obj){const enc=await packRecord(name,obj);return new Promise((ok,no)=>{const tx=db.transaction(name,'readwrite');tx.objectStore(name).put(enc);tx.oncomplete=()=>ok();tx.onerror=()=>no(tx.error);tx.onabort=()=>no(tx.error||Error('Speicherfehler'));});}
 function del(name,id){return new Promise((ok,no)=>{const tx=db.transaction(name,'readwrite');tx.objectStore(name).delete(id);tx.oncomplete=()=>ok();tx.onerror=()=>no(tx.error);tx.onabort=()=>no(tx.error||Error('Löschfehler'));});}
+function isAutoMeta(meta){return !!(meta&&((meta.mode&&meta.mode==='auto-device')||meta.noPassword===1));}
+async function writeAutoProtectedData(clearEntries,clearPhotos){const salt=randomBytes(16),iterations=350000,key=await makeDataKey(AUTO_UNLOCK_PASS,salt,iterations);const es=await Promise.all(clearEntries.map(e=>seal(e,e.id,key)));const ps=[];for(const photo of clearPhotos){const bytes=await photo.blob.arrayBuffer();ps.push(await seal({...photo,blobType:photo.blob.type,blob:toB64(bytes)},photo.id,key));}const check=await seal({value:SECURE_CHECK},'check',key);await new Promise((ok,no)=>{const tx=db.transaction(['entries','photos','security'],'readwrite');const e=tx.objectStore('entries'),p=tx.objectStore('photos'),s=tx.objectStore('security');e.clear();p.clear();s.clear();for(const row of es)e.put(row);for(const row of ps)p.put(row);s.put({id:'local',salt:toB64(salt),iterations,check,created:new Date().toISOString(),noPassword:1,mode:'auto-device'});tx.oncomplete=()=>ok();tx.onerror=()=>no(tx.error||Error('Auto-Schutz konnte nicht gespeichert werden'));tx.onabort=()=>no(tx.error||Error('Auto-Schutz abgebrochen'));});dataKey=key;}
+async function migrateCurrentVaultToAuto(){const clearEntries=await all('entries');const clearPhotos=await all('photos');await writeAutoProtectedData(clearEntries,clearPhotos);}
 function requestDataPassword(isNew, initialError=""){
  return new Promise((resolve,reject)=>{
   const v=$('view');
@@ -51,25 +55,28 @@ function requestDataPassword(isNew, initialError=""){
   form.addEventListener('submit',event=>{event.preventDefault();const pass=$('data-password').value,confirmPass=isNew?$('data-password-confirm').value:pass;if(isNew&&pass.length<12){error.textContent='Bitte mindestens 12 Zeichen eingeben.';return;}if(isNew&&pass!==confirmPass){error.textContent='Die Passwörter stimmen nicht überein.';return;}form.querySelector('button').disabled=true;resolve(pass);},{once:false});
  });
 }
-async function unlockLocal(){if(!crypto?.subtle)throw Error('Web Crypto nicht verfügbar; HTTPS erforderlich');const meta=await readMeta();if(meta){
-  let promptError="";
+async function unlockLocal(){if(!crypto?.subtle)throw Error('Web Crypto nicht verfügbar; HTTPS erforderlich');const meta=await readMeta();if(meta&&isAutoMeta(meta)){const key=await makeDataKey(AUTO_UNLOCK_PASS,fromB64(meta.salt),meta.iterations);const marker=await unseal(meta.check,key);if(marker.value!==SECURE_CHECK)throw Error('Automatischer Prüfwert fehlerhaft');dataKey=key;return;}
+if(meta){
+  let promptError='';
   for(;;){
-    const pass=await requestDataPassword(false,promptError);
+    const pass=await requestDataPassword(false,promptError||'Einmalig das bisherige Passwort eingeben. Danach wird die Passwortabfrage entfernt.');
     try{
       const key=await makeDataKey(pass,fromB64(meta.salt),meta.iterations);
       const marker=await unseal(meta.check,key);
       if(marker.value!==SECURE_CHECK)throw Error('Prüfwert fehlerhaft');
-      dataKey=key;return;
+      dataKey=key;
+      await migrateCurrentVaultToAuto();
+      return;
     }catch(e){
       promptError='Passwort stimmt nicht oder die Daten können nicht entschlüsselt werden. Bitte erneut eingeben.';
     }
   }
 }
-const pass=await requestDataPassword(true);const salt=randomBytes(16),iterations=350000,key=await makeDataKey(pass,salt,iterations);
-const [entries,photos]=await Promise.all([readRaw('entries'),readRaw('photos')]);if(entries.some(v=>v.secure===1)||photos.some(v=>v.secure===1))throw Error('Unerwartete verschlüsselte Altbestände; Migration gestoppt');
-const es=await Promise.all(entries.map(e=>seal(e,e.id,key)));const ps=[];for(const photo of photos){const bytes=await photo.blob.arrayBuffer();ps.push(await seal({...photo,blobType:photo.blob.type,blob:toB64(bytes)},photo.id,key));}
-const check=await seal({value:SECURE_CHECK},'check',key);
-await new Promise((ok,no)=>{const tx=db.transaction(['entries','photos','security'],'readwrite');const e=tx.objectStore('entries'),p=tx.objectStore('photos');e.clear();p.clear();for(const row of es)e.put(row);for(const row of ps)p.put(row);tx.objectStore('security').put({id:'local',salt:toB64(salt),iterations,check,created:new Date().toISOString()});tx.oncomplete=()=>ok();tx.onerror=()=>no(tx.error||Error('Migration fehlgeschlagen'));tx.onabort=()=>no(tx.error||Error('Migration abgebrochen'));});dataKey=key;
+const entries=await readRaw('entries');
+const photoRows=await readRaw('photos');
+const clearEntries=entries.filter(Boolean);
+const clearPhotos=photoRows.filter(Boolean).map(photo=>photo.blob instanceof Blob?photo:{...photo,blob:new Blob([photo.blob],{type:photo.blob?.type||'application/octet-stream'})});
+await writeAutoProtectedData(clearEntries,clearPhotos);
 }
 async function removeEntryWithPhotos(id){
  const photos=await readRaw('photos');const target=[];
