@@ -9,8 +9,9 @@ const weekStart=day=>{const d=new Date(day+'T12:00:00');const dow=(d.getDay()+6)
 const monthTitle=month=>new Date(month+'-01T12:00:00').toLocaleDateString('de-AT',{month:'long',year:'numeric'});
 const dLabel=day=>new Date(day+'T12:00:00').toLocaleDateString('de-AT',{weekday:'short',day:'numeric',month:'short'});
 const categoriesForDate=(key)=>{
+ const cleaning=typeof window.mrpP02CalendarEvents==='function'?window.mrpP02CalendarEvents(key):[];
  const acts=apptsOnDay(key),works=(db.work||[]).filter(w=>w.date===key);
- return {acts,works,private:acts.some(a=>a.category==='Privat'),done:acts.some(a=>a.status==='Erledigt')||works.some(w=>w.status==='Erledigt'),work:works.some(w=>w.status!=='Erledigt'&&w.status!=='Abgesagt')||acts.some(a=>a.category!=='Privat'&&a.status!=='Erledigt'&&a.status!=='Abgesagt'),cancelled:acts.some(a=>a.status==='Abgesagt'),count:acts.length+works.length};
+ return {acts,works,cleaning,private:acts.some(a=>a.category==='Privat'),done:acts.some(a=>a.status==='Erledigt')||works.some(w=>w.status==='Erledigt'),work:works.some(w=>w.status!=='Erledigt'&&w.status!=='Abgesagt')||acts.some(a=>a.category!=='Privat'&&a.status!=='Erledigt'&&a.status!=='Abgesagt'),cancelled:acts.some(a=>a.status==='Abgesagt'),count:acts.length+works.length+cleaning.length};
 };
 const dateButton=(key,outside=false)=>{
  const c=categoriesForDate(key),isSelected=selectedDay===key,isToday=today()===key;
@@ -18,6 +19,7 @@ const dateButton=(key,outside=false)=>{
  if(c.work)markers.push('<span class="cal12-dot work" aria-label="Arbeit geplant"></span>');
  if(c.done)markers.push('<span class="cal12-dot done" aria-label="Arbeit erledigt"></span>');
  if(c.private)markers.push('<span class="cal12-dot private" aria-label="Privater Termin"></span>');
+ if(c.cleaning.length)markers.push('<span class="cal12-dot p02-clean" aria-label="Putzaufgabe geplant"></span>');
  if(c.cancelled)markers.push('<span class="cal12-dot cancelled" aria-label="Abgesagt"></span>');
  const named=key+' · '+c.count+' Einträge';
  return `<button type="button" data-calendar-day="${key}" class="cal12-cell ${outside?'other':''} ${isSelected?'selected':''} ${isToday?'today':''}" aria-pressed="${isSelected}" aria-label="${esc(named)}"><strong>${Number(key.slice(8))}</strong><span class="cal12-markers">${markers.slice(0,3).join('')}${markers.length>3?'<i>+</i>':''}</span></button>`;
@@ -74,6 +76,8 @@ const timeline=()=>{
   const hours=workHoursForDate(w,selectedDay),time=hours>0?` · ${mr1961Hours(hours)}`:'';
   entries.push({start,markup:`<article class="cal12-event ${type.type}"><span class="cal12-time">${esc(start||'—')}</span><span class="cal12-symbol" aria-hidden="true">${type.icon}</span><div class="cal12-event-body"><b>${esc(w.title||'Arbeit')}</b><small>${esc(w.category||'Arbeitsauftrag')}${time}</small><div class="cal12-chips"><span class="cal12-chip ${type.type}">${type.label}</span>${w.note?'<span class="cal12-chip">▤ Notiz</span>':''}${count?`<span class="cal12-chip">▣ ${count} Fotos</span>`:''}${(w.materials||[]).length?'<span class="cal12-chip">⬡ Material</span>':''}</div></div><button class="cal12-event-open" type="button" data-work-detail="${esc(w.id)}" aria-label="Arbeit ${esc(w.title||'')} öffnen">›</button></article>`});
  }
+ const cleaning=typeof window.mrpP02CalendarEvents==='function'?window.mrpP02CalendarEvents(selectedDay):[];
+ for(const c of cleaning){entries.push({start:'',markup:`<article class="cal12-event private p02-calendar-entry"><span class="cal12-time">🧹</span><span class="cal12-symbol">☑</span><div class="cal12-event-body"><b>${esc(c.title)}</b><small>${esc(c.place)} · ${esc(c.label)}</small><div class="cal12-chips"><span class="cal12-chip private">Haushalt · Putzplan</span>${c.shifted?'<span class="cal12-chip">↪ Verschoben</span>':''}</div></div><button class="cal12-event-open" type="button" data-p02-calendar-task="${esc(c.id)}" aria-label="Putzplan ${esc(c.title)} bearbeiten">›</button></article>`});}
  entries.sort((a,b)=>(a.start?'0':'1') .localeCompare(b.start?'0':'1')||a.start.localeCompare(b.start));
  target.innerHTML=entries.length?entries.map(v=>v.markup).join(''):'<div class="cal12-empty"><span>▦</span><strong>Für diesen Tag ist noch nichts eingetragen.</strong><small>Mit „Neuer Termin“ kannst du deinen Tag planen.</small></div>';
 };
