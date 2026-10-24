@@ -1,0 +1,19 @@
+/* P07 – concise navigation, reliable unique icon mapping, glove quick entry. */
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px!important;overflow:visible!important;padding:4px 0 9px!important}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button{min-width:0!important;min-height:116px!important;white-space:normal;overflow-wrap:anywhere;font-size:11px!important}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button:before{content:''!important;display:block!important;background-size:contain!important;background-position:center!important;background-repeat:no-repeat!important;width:61px;height:68px;flex-basis:68px;filter:drop-shadow(0 5px 4px #001e1ca8)}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button[data-mrp-tab=overview]:before{background-image:url('icons3d/ui-home.svg')!important}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button[data-mrp-tab=places]:before{background-image:url('icons3d/ui-home.svg')!important}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button[data-mrp-tab=tasks]:before{background-image:url('icons3d/ui-calendar.svg')!important}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button[data-mrp-tab=clean]:before{background-image:url('icons3d/cleaning.png')!important}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button[data-mrp-tab=p06]:before{background-image:url('icons3d/box.png')!important}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button[data-mrp-tab=devices]:before{background-image:url('icons3d/drill.png')!important}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button[data-mrp-tab=knowledge]:before{background-image:url('icons3d/ui-work.svg')!important}
+body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button[data-mrp-tab=reports]:before{background-image:url('icons3d/ui-money.svg')!important}
+.p07-glove-banner{border:1px solid #58c8a4;border-radius:16px;padding:11px;display:flex;align-items:center;gap:12px;background:linear-gradient(130deg,#093d37,#0b262f);margin:13px 0}
+.p07-glove-banner img{height:56px;width:56px;object-fit:contain;flex-shrink:0}
+.p07-glove-banner>div{min-width:0;flex:1}.p07-glove-banner b,.p07-glove-banner small{display:block}.p07-glove-banner small{font-size:12px;line-height:1.35;margin-top:5px;color:#b8e4d4}.p07-glove-banner button{white-space:normal;font-weight:800}
+.p07-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.p07-quickbuttons{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.p07-quickbuttons span{font-size:12px;color:#c0e9da}.p07-quickbuttons button{padding:11px;border:1px solid #53ae95;color:#eaffee;border-radius:12px;background:#175549;min-height:44px;flex:1 1 70px;font-weight:750}
+.p07-explainer{font-size:13px;color:#b8e4d4;line-height:1.5}.p07-mapping-others{margin-top:18px;border:1px solid #386b63;border-radius:12px;padding:10px}.p07-mapping-others summary{cursor:pointer;padding:8px;font-size:14px;font-weight:750;color:#a6f2d2}
+.p07-extra-links{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.p07-extra-links button{background:#102d31;border:1px solid #376a62;color:#d0f5e4;border-radius:10px;padding:10px 12px;font-size:12px;min-height:42px;cursor:pointer}
+@media(max-width:405px){.p07-glove-banner{flex-wrap:wrap}.p07-glove-banner>div{flex:1 1 calc(100% - 80px)}.p07-glove-banner button{flex:1 1 100%}.p07-two{grid-template-columns:1fr}body.premium-v192 #mrp-household-root .mrc-house .mrp-tabs button:before{width:54px;height:60px;flex-basis:60px}}

@@ -1,8 +1,8 @@
 {
   "name": "MR-Hausservice – Gewerbe & Privat",
   "short_name": "MR-Hausservice",
-  "description": "MR-Hausservice V1.9.10.5 – Gewerbe, Familie & Privat, Frauen-Gesundheit und Haushalt & Putzen",
-  "start_url": "./index.html?v=199105",
+  "description": "MR-Hausservice V1.9.10.6 – Gewerbe, Familie & Privat, Frauen-Gesundheit und Haushalt & Putzen",
+  "start_url": "./index.html?v=199106",
   "scope": "./",
   "display": "standalone",
   "background_color": "#09121a",

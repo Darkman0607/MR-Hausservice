@@ -1,0 +1,8 @@
+{
+  "version": "1.9.10.6",
+  "date": "2026-10-25",
+  "status": "automated-tests-passed",
+  "changes": ["putzrelevante Artikel standardmaessig filtern, bewusste Freigabe moeglich", "Handschuhe in Paaren grossmengenfaehig erfassen", "doppelte Geraete- und Statistik-Kacheln bereinigt", "Materialansichten auf gereinigte Auswahl abstimmen", "Touch-Bedienung und Sicherheitspruefungen"],
+  "tests": {"node": "79/79", "chromium_component_smoke": "passed"},
+  "pending": ["Android-Smartphone E2E", "Backup Wiederherstellung mit Echtdaten", "Sonderkategorien im realen Lager pruefen"]
+}
