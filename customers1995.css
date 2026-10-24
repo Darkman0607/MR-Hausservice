@@ -1,0 +1,72 @@
+/* MR-Hausservice V1.9.9.5 – Kundenverwaltung */
+body.premium-v192 #customers{max-width:900px;margin:0 auto;padding-bottom:115px;color:#effff9;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+#customers .mrk-hero{padding:22px 18px 17px;border:1px solid #3eae8f;border-radius:24px;background:radial-gradient(circle at 100% 0%,#12604d,#0e3031 45%,#111d2b 90%);box-shadow:0 12px 30px #0009,inset 0 1px #a8ffe548;margin:10px 0 17px}
+#customers .mrk-kicker{font-size:11px;font-weight:750;color:#89f8d0;letter-spacing:1.4px;text-transform:uppercase}
+#customers .mrk-hero h1{font:850 clamp(25px,7vw,36px)/1.18 system-ui!important;margin:15px 0 8px!important;color:#fff!important}
+#customers .mrk-hero p{color:#c7e6db;font-size:13px;line-height:1.5;margin:0}
+#customers .mrk-counts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:16px 0 0}
+#customers .mrk-counts div{border:1px solid #4ba48c88;background:#06282390;padding:11px 6px;border-radius:15px;display:flex;align-items:center;flex-direction:column;gap:3px}
+#customers .mrk-counts b{font-size:23px;color:#8dfbd2}#customers .mrk-counts span{font-size:11px;color:#b9d6cf;text-align:center}
+#customers button{cursor:pointer}#customers .mrk-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+#customers .mrk-toolbar input,#customers .mrk-toolbar select{background:#112b34;border:1px solid #427b77;color:white;border-radius:13px;min-height:49px;padding:9px 12px;font:500 14px system-ui;min-width:0}
+#customers .mrk-toolbar input{flex:1 1 180px}#customers .mrk-toolbar select{flex:1 1 116px}
+#customers .mrk-primary{min-height:49px;padding:10px 15px;background:linear-gradient(135deg,#37e4ac,#0a9b77);border:1px solid #85ffe0;color:#06291f;border-radius:13px;box-shadow:0 4px 18px #25e4aa30;font-weight:800}
+#customers .mrk-toolbar .mrk-primary{flex:1 1 140px}
+#customers .mrk-list-head{display:flex;justify-content:space-between;align-items:center;margin:0 0 12px;gap:12px}
+#customers .mrk-list-head h2{font:800 20px system-ui!important;margin:0!important;color:#fff}
+#customers .mrk-list-head span{font-size:12px;color:#a2c9c3}
+#customers .mrk-customer-card{width:100%;display:flex;gap:12px;align-items:center;padding:13px 11px;margin:0 0 10px;border-radius:17px;background:linear-gradient(120deg,#122c36,#172331);border:1px solid #326d69;color:#f3fffb;min-height:112px;text-align:left;box-shadow:0 8px 17px #0005}
+#customers .mrk-customer-card:hover{border-color:#73ffcc}
+#customers .mrk-avatar,#customers .mrk-big-avatar{display:grid;place-items:center;flex:0 0 51px;height:51px;width:51px;border-radius:15px;background:#144a47;border:1px solid #3b9985;color:#96f8d7;font:850 20px system-ui;overflow:hidden}
+#customers .mrk-avatar img,#customers .mrk-big-avatar img{width:100%;height:100%;object-fit:cover}
+#customers .mrk-item-body{min-width:0;flex:1;display:flex;flex-direction:column;gap:5px}
+#customers .mrk-item-body strong{font:770 15px system-ui;overflow-wrap:anywhere}
+#customers .mrk-item-body small{font-size:12px;color:#a7c9c6}
+#customers .mrk-item-body span{font-size:11px;color:#afc5c0;max-height:2.7em;overflow:hidden}
+#customers .mrk-side{display:flex;flex:0 0 70px;flex-direction:column;align-items:flex-end;gap:6px}
+#customers .mrk-side small{font-size:10px;color:#b4cac7}#customers .mrk-side b{color:#8bffc9}
+#customers .mrk-pill{display:inline-flex;align-items:center;justify-content:center;padding:4px 7px;font:750 10px system-ui;border-radius:999px;color:#94ffd8;background:#17463a;border:1px solid #39896e}
+#customers .mrk-pill.Interessent{color:#ffdf9a;background:#4d3926;border-color:#86633f}
+#customers .mrk-pill.Pausiert{color:#bdc9dc;background:#303a50;border-color:#54667b}
+#customers .mrk-pill.Archiviert{color:#d1b9c9;background:#3d303b;border-color:#644760}
+#customers .mrk-empty{border:1px dashed #4b8c7e;background:#102f37;border-radius:19px;padding:40px 20px;text-align:center}
+#customers .mrk-empty span{display:block;font-size:35px;margin-bottom:8px}#customers .mrk-empty strong{display:block;font-size:16px}#customers .mrk-empty p{font-size:13px;color:#b4d3cc}
+#customers .mrk-detail-bar{display:flex;align-items:center;justify-content:space-between;margin:12px 0}#customers .mrk-detail-bar button{background:#183e3a;border:1px solid #4d9c83;color:#e1ffed;padding:11px 15px;border-radius:12px}
+#customers .mrk-details-head{display:flex;align-items:center;gap:15px;padding:16px 0}
+#customers .mrk-big-avatar{width:67px;height:67px;flex-basis:67px;border-radius:21px;font-size:28px}
+#customers .mrk-details-head h2{color:white;font:800 23px/1.2 system-ui!important;margin:8px 0 5px!important;overflow-wrap:anywhere}
+#customers .mrk-details-head p{color:#bdd8cf;font-size:13px;margin:0}
+#customers .mrk-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:10px 0 17px}
+#customers .mrk-actions button{border:1px solid #397c75;background:linear-gradient(130deg,#1e4d4b,#132b35);border-radius:13px;color:#e3fff6;min-height:48px;font-weight:740;font-size:12px}
+#customers .mrk-actions button[data-action=new-work]{background:#136852;border-color:#5af0b4}
+#customers .mrk-block{background:linear-gradient(130deg,#152a36,#0d242c);border:1px solid #356e69;border-radius:17px;padding:16px;margin:12px 0}
+#customers .mrk-block h3{font:790 16px system-ui!important;margin:0 0 14px!important;color:#f1fff9}
+#customers .mrk-block p{color:#b9d3d0;font-size:13px;line-height:1.6;margin:9px 0 2px;white-space:pre-wrap;overflow-wrap:anywhere}
+#customers .mrk-contact{display:grid;gap:12px;font-size:13px}#customers .mrk-contact a{color:#91f4ce;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+#customers .mrk-contact div{display:flex;gap:9px;overflow-wrap:anywhere;color:#dceee8}
+#customers .mrk-meta{font-size:12px;color:#87d8c2;margin-top:8px}#customers .mrk-section-title{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#customers .mrk-section-title button{background:#175544;color:#d3ffee;padding:7px 11px;border:1px solid #4bb597;border-radius:10px;font-weight:700}
+#customers .mrk-task{display:flex;align-items:center;gap:9px;padding:12px 0;border-bottom:1px solid #345a5a;color:#e8faf1;font-size:13px}
+#customers .mrk-task input{accent-color:#35dfaa;width:20px;height:20px;flex-shrink:0}#customers .mrk-task span{flex:1;overflow-wrap:anywhere}#customers .mrk-task span.checked{text-decoration:line-through;color:#9bb8b0}
+#customers .mrk-task button{background:none;border:0;color:#f3a7bc;font-size:25px;padding:2px 8px}
+#customers .mrk-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}#customers .mrk-metrics div{text-align:center;background:#0b3737;padding:12px 3px;border-radius:11px}#customers .mrk-metrics b{display:block;font-size:22px;color:#72f5bc}#customers .mrk-metrics small{font-size:11px;color:#c0d3cd}
+#customers .mrk-order{padding:11px 0;border-bottom:1px solid #36575a;display:flex;flex-direction:column;gap:4px;font-size:12px}#customers .mrk-order span{color:#aac7c2}
+#customers .mrk-footer-actions{text-align:right}#customers .mrk-footer-actions button{background:transparent;border:0;color:#f1b0bf;padding:11px;font-size:12px}
+#customers #mrk-dialog[hidden]{display:none!important}
+#customers #mrk-dialog{position:fixed;inset:0;z-index:1500;background:#061b1de8;display:flex;align-items:center;justify-content:center;padding:10px}
+#customers .mrk-dialog-card{width:min(670px,100%);max-height:92dvh;overflow:auto;border:1px solid #62b396;border-radius:20px;background:#0d2832;color:#fff;padding:19px 15px 20px;box-shadow:0 15px 65px #000d}
+#customers .mrk-dialog-card h2{font:800 21px system-ui!important;color:#fff!important;margin:0 0 16px!important}
+#customers .mrk-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#customers .mrk-form-grid label{display:flex;flex-direction:column;gap:7px;font:680 12px system-ui;color:#c9e5da}
+#customers .mrk-wide{grid-column:1/-1}
+#customers input:not([type=checkbox]):not([type=file]),#customers textarea,#customers select{width:100%;box-sizing:border-box;border:1px solid #46766e;border-radius:11px;background:#102f39;color:white;font:500 15px system-ui;padding:11px 10px;min-height:43px}
+#customers textarea{resize:vertical;min-height:75px}#customers input:focus,#customers select:focus,#customers textarea:focus{outline:2px solid #64dba8;outline-offset:1px}
+#customers .mrk-photo-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;font:500 12px system-ui}
+#customers .mrk-photo-preview{width:58px;height:58px;background:#145546;border:1px solid #69b99c;border-radius:13px;display:grid;place-items:center;font-size:29px;overflow:hidden}
+#customers .mrk-photo-preview img{height:100%;width:100%;object-fit:cover}
+#customers .mrk-small-check{display:flex;align-items:center;gap:4px}#customers .mrk-privacy{color:#9cc8bc;font-size:11px;line-height:1.5}
+#customers .mrk-form-buttons{display:flex;justify-content:flex-end;gap:9px;margin-top:17px}#customers .mrk-form-buttons button:not(.mrk-primary){background:#263b45;border:1px solid #61867a;border-radius:12px;color:white;padding:11px 14px}
+#customers #mrk-notice{position:fixed;z-index:1700;bottom:100px;left:12px;right:12px;margin:auto;max-width:600px;background:#125945;border:1px solid #7bf0bc;color:white;border-radius:13px;padding:12px;text-align:center;font-size:13px}
+#customers #mrk-notice.bad{background:#5b2935;border-color:#ef9dae}
+body.premium-v192 #customers .page-head193{margin:0 0 8px}
+@media(max-width:390px){#customers .mrk-hero{padding:17px 13px}#customers .mrk-actions{grid-template-columns:1fr 1fr}#customers .mrk-customer-card{gap:9px;padding:11px 8px}#customers .mrk-avatar{flex-basis:43px;width:43px;height:43px}#customers .mrk-side{flex-basis:62px}}
