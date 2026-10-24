@@ -9,7 +9,7 @@ function openWomen(target='home'){
  else document.querySelector('[data-mrp-go="mrp-women"]')?.click();
  const frame=document.getElementById('mrw-frame');if(!frame)return;
  const send=()=>{try{frame.contentWindow?.postMessage({type:'mr-women-navigate',target},location.origin)}catch(e){console.warn('Navigation Frauen-App:',e)}};
- document.querySelectorAll('.mrw-section-tabs [data-mrw-open]').forEach(b=>{const active=b.dataset.mrwOpen===target;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+ document.querySelectorAll('.mrw-section-tabs [data-mrw-open], .mrw-premium-bottom [data-mrw-open]').forEach(b=>{const active=b.dataset.mrwOpen===target;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
  if(!frame.hasAttribute('src')){frame.addEventListener('load',send,{once:true});frame.setAttribute('src',frame.dataset.src)}else send();
 }
 document.addEventListener('click',e=>{
@@ -38,7 +38,7 @@ window.addEventListener('message',event=>{
  }
  if(event.data?.type==='mr-women-page'){
    const page=String(event.data.target||'');
-   document.querySelectorAll('.mrw-section-tabs [data-mrw-open]').forEach(b=>{const active=b.dataset.mrwOpen===page;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+   document.querySelectorAll('.mrw-section-tabs [data-mrw-open], .mrw-premium-bottom [data-mrw-open]').forEach(b=>{const active=b.dataset.mrwOpen===page;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
  }
 });
 window.MR_V2_OPEN_WOMEN=openWomen;
