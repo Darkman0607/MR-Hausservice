@@ -2,7 +2,7 @@
    Do not import commercial objects automatically; old backup and PDF paths stay intact. */
 (function(){
 'use strict';
-const VERSION='1.9.10.3';
+const VERSION='1.9.10.4';
 const types=['Objekt','Stockwerk / Bereich','Raum','Zone','Schrank','Lagerplatz'];
 const tabs=[['overview','Übersicht'],['places','Objekte & Räume'],['tasks','Putzpläne'],['clean','Reinigung'],['supplies','Material'],['knowledge','Wissen & Hygiene'],['devices','Geräte'],['reports','Statistik']];
 let tab='overview',editor=null,mode='business',booted=false;
@@ -519,6 +519,8 @@ const p05OldReports=reportsPanel;
 reportsPanel=function(){const sessions=state().sessions,open=sessions.flatMap(s=>p05.defects(s).filter(d=>d.status!=='resolved').map(d=>({...d,sessionId:s.id})));return p05OldReports()+`<section class="p05-section"><h3>✅ Nacharbeitskontrolle – ${open.length} offene Mängel</h3>${open.map(d=>`<div class="p05-item"><b>${safe(placeName(d.roomId))}</b> · ${safe(d.description)} ${button('session-detail','Bericht öffnen',d.sessionId)}</div>`).join('')||hint('Keine offenen Mängel in abgeschlossenen Reinigungen.')}</section>`;};
 document.addEventListener('change',e=>{const v=e.target;if(v.matches('[data-p05-surface]')){change(h=>{if(!h.active)throw Error('Keine laufende Reinigung');h.active.p05SurfaceByRoom||={};if(v.value&&!p05.guidance[v.value])throw Error('Unbekannte Oberfläche');h.active.p05SurfaceByRoom[h.active.roomId]=v.value;});return;}if(!v.matches('[data-p05-check]'))return;const sessionId=v.dataset.p05Session||'',key=v.dataset.p05Check,checked=v.checked;change(h=>{const target=sessionId?h.sessions.find(x=>x.id===sessionId):h.active;if(!target)throw Error('Reinigung nicht gefunden.');p05.setCheck(target,key,checked)}).then(ok=>{if(sessionId&&ok){document.querySelectorAll('body > .mrp-layer').forEach(layer=>{if(layer.querySelector('[data-detail-close]'))layer.remove();});detailsSession(sessionId);}});},true);
 
+/* WK-01 bis WK-05: Wohnungskarte, neue Darstellung und gespeicherter Raumzustand. */
+if(globalThis.MRRoomMap?.install){globalThis.MRRoomMap.install({state,change,getOverview:()=>overview,setOverview:fn=>{overview=fn},getMap:()=>mr91Map,setMap:fn=>{mr91Map=fn},setTab:name=>{tab=name;refresh()}})}
 function init(){booted=true;state();bind();render();const preferred=settings.mrpMode||'business';chooseMode(preferred,false);}
 // The existing app loads the IndexedDB asynchronously in verbesserungen1961.js; hook its rendering only after the actual read.
 const loadedRender=render;let called=false;
