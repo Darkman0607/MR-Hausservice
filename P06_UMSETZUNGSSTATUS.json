@@ -1,0 +1,7 @@
+{
+ "version": "1.9.10.5",
+ "updated_at": "2026-10-25",
+ "purpose": "Separate Putzlager-Sondererweiterung, nicht Master-Paket P06",
+ "decisions": {"1":"A (einfache Mengen)","2":"C","3":"Geschirrtücher und Putztücher","4":"C","5":"C","6":"C","7":"C","8":"C","9":"C","10":"C","11":"C","12":"C","13":"A","14":"C","15":"C","16":"C","17":"jetzt A; später C","18":"C"},
+ "open_acceptance": ["Android-Smartphone-E2E", "Backup/Wiederherstellen mit Echtdaten", "Umfangreicher Inventurdurchlauf", "Physische Erfassung einzelner geöffneter Flaschen statt nur rechnerischer Aufteilung"]
+}

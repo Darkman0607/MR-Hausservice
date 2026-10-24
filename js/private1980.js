@@ -2,9 +2,9 @@
    Do not import commercial objects automatically; old backup and PDF paths stay intact. */
 (function(){
 'use strict';
-const VERSION='1.9.10.4';
+const VERSION='1.9.10.5';
 const types=['Objekt','Stockwerk / Bereich','Raum','Zone','Schrank','Lagerplatz'];
-const tabs=[['overview','Übersicht'],['places','Objekte & Räume'],['tasks','Putzpläne'],['clean','Reinigung'],['supplies','Material'],['knowledge','Wissen & Hygiene'],['devices','Geräte'],['reports','Statistik']];
+const tabs=[['overview','Übersicht'],['places','Objekte & Räume'],['tasks','Putzpläne'],['clean','Reinigung'],['supplies','Material'],['p06','Putzlager'],['knowledge','Wissen & Hygiene'],['devices','Geräte'],['reports','Statistik']];
 let tab='overview',editor=null,mode='business',booted=false;
 const id=()=>uid(),safe=s=>esc(s),dateNow=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},n=v=>Math.max(0,Number(v)||0);
 function state(){
@@ -59,7 +59,7 @@ function privateHome(){const h=state(),tasks=dueTasks(),suppliesLow=h.supplies.f
   {cls:'project',title:'Private Projekte',desc:'Ideen, Pläne, To-dos',extra:'Planung vorbereitet',attrs:'data-mrp-action="planned"'},
   {cls:'notes',title:'Notizen & Sonstiges',desc:'Notizen, Listen, Aufzeichnungen',extra:`${suppliesLow} Warnung(en)`,attrs:'data-mrp-action="planned"'}
  ];
- return `<div class="mrf-home">
+ return `<div class="mrf-home">${globalThis.MRP06UI?.privateNotice(db,h)||''}
  <div class="mrf-welcome"><h1>Hallo! <span>♥</span></h1><p>Dein Zuhause. Deine Familie. Dein Alltag. In einer App.</p></div>
  <div class="mrf-module-grid">${modules.map(m=>`<button type="button" class="mrf-module mrf-${m.cls}" ${m.attrs}><span class="mrf-module-art" aria-hidden="true"></span><strong>${m.title}</strong><small>${m.desc}</small><em>${m.extra}</em><i>›</i></button>`).join('')}</div>
  </div>`;
@@ -76,7 +76,7 @@ function sharedToday(){const ts=dateNow(),h=state();const appts=(Array.isArray(d
  `<div class="mrp-notice">Diese Übersicht bündelt deine privaten Termine, Haushaltsaufgaben und fällige Wartungen. Weitere Familienmodule werden in späteren Updates ergänzt.</div>`;
 }
 function householdShell(){return `<div class="mrp-hero"><small>MR PRIVAT</small><h1>🧹 Haushalt & Putzen</h1><small>Räume · Reinigungen · Materialien · Geräte · Auswertungen</small></div>
-<div class="mrp-tabs" role="tablist">${tabs.map(([key,t])=>`<button type="button" data-mrp-tab="${key}" class="${tab===key?'active':''}" aria-selected="${tab===key}">${safe(t)}</button>`).join('')}</div><div class="mrp-tab-panel">${({overview,places:placesPanel,tasks:tasksPanel,clean:cleanPanel,supplies:suppliesPanel,knowledge:p05KnowledgePanel,devices:devicesPanel,reports:reportsPanel})[tab]()}</div>`}
+<div class="mrp-tabs" role="tablist">${tabs.map(([key,t])=>`<button type="button" data-mrp-tab="${key}" class="${tab===key?'active':''}" aria-selected="${tab===key}">${safe(t)}</button>`).join('')}</div><div class="mrp-tab-panel">${({overview,places:placesPanel,tasks:tasksPanel,clean:cleanPanel,supplies:suppliesPanel,knowledge:p05KnowledgePanel,devices:devicesPanel,reports:reportsPanel,p06:()=>globalThis.MRP06UI?.panel(db,state())||'Putzlager lädt…'})[tab]()}</div>`}
 function overview(){const h=state(),dueList=dueTasks(),recent=h.sessions.slice(-3).reverse();return `<div class="mrp-cards"><div class="mrp-stat"><b>${h.places.length}</b><small>Standorte/Bereiche</small></div><div class="mrp-stat"><b>${dueList.length}</b><small>Jetzt fällig</small></div><div class="mrp-stat"><b>${h.tasks.length}</b><small>Reinigungspläne</small></div><div class="mrp-stat"><b>${h.devices.length}</b><small>Haushaltsgeräte</small></div></div>
 <div class="mrp-quick"><button data-mrp-action="new-place"><strong>＋</strong>Objekt / Raum anlegen</button><button data-mrp-action="new-task"><strong>☑</strong>Putzaufgabe planen</button><button data-mrp-action="new-session"><strong>⏱</strong>Reinigung starten</button><button data-mrp-action="new-supply"><strong>🧴</strong>Material erfassen</button></div>
 <div class="mrp-panel"><h2>Heute fällige Aufgaben</h2>${dueList.length?dueList.slice(0,8).map(t=>`<div class="mrp-row"><div class="mrp-row-main"><b>${safe(t.title)}</b><small>${safe(pathName(t.placeId))} · ${safe(formatDate(due(t)))}</small></div>${button('new-session','Erledigen',t.placeId)}</div>`).join(''):hint('Keine fälligen Aufgaben. Erstelle unter „Putzpläne“ deinen ersten Plan.')}</div>
@@ -99,6 +99,7 @@ function cleanPanel(){const h=state(),s=h.active;
  <h3>Arbeitszeit je Raum</h3>${s.roomIds.map(x=>`<div class="mrp-row"><span>${safe(placeName(x))}</span><b class="mrp-room-time" data-room="${safe(x)}">${duration(roomMsTotal(s,x))}</b></div>`).join('')}</div>
  ${p03StepPanel(s)}
  ${p04MaterialPanel(s)}
+ ${globalThis.MRP06UI?.kitPanel(db,state(),s)||''}
  ${p05SessionKnowledge(s)}
  ${p05QualityPanel(s)}
  <div class="mrp-panel"><h2>📷 Dokumentation</h2><p>Vorher- und Nachher-Fotos werden in die Gesamtsicherung aufgenommen. Große Bilder benötigen Speicher.</p><div class="mrp-field"><label>Vorher-Fotos hinzufügen</label><input type="file" accept="image/*" multiple data-mrp-photo="before"></div>${p03PhotoGrid(s,"before")}<div class="mrp-field"><label>Nachher-Fotos hinzufügen</label><input type="file" accept="image/*" multiple data-mrp-photo="after"></div>${p03PhotoGrid(s,"after")}${p03CompareButton(s)}<div class="mrp-field"><label>Notizen</label><textarea id="mrp-session-notes" rows="3" placeholder="Besonderheiten, Schäden, Ergebnis ...">${safe(s.note||'')}</textarea></div></div>${p03FinishPanel(s)}`;
@@ -441,9 +442,9 @@ suppliesPanel=function(){const rows=p04StockRows(),business=p04StockRows('Gewerb
  <section class="mrp-panel p04-card"><h3>📒 Buchungshistorie & Korrekturen</h3>${p04HistoryPanel()}</section>`;};
 function p04StockCard(x){const qty=Number.isFinite(x.qty)?p04Fmt(x.qty)+' '+x.unit:'⚠ Menge fehlt',price=Number.isFinite(x.price)?money(x.price):'–';return `<div class="p04-list-row"><div><b>${safe(x.title)}</b><small>${safe(x.location?.place||'')} · ${safe(x.scope)} · ${safe(qty)} · Preis ${safe(price)} / ${safe(x.unit)}</small>${x.minimum>0&&x.qty<=x.minimum?'<em>⚠ Nachkaufen</em>':''}</div><div class="p04-actions">${button('p04-open-stock','↗ Details',x.id)}${button('p04-config','⚙ Minimum/Preis',x.key)}${button('p04-transfer','↔ Umlagern',x.key)}${button('p04-barcode-edit','▣ Code',x.id)}${button('p05-edit','🧪 Wissen/Dosis',x.key)}${button('p05-doc','📄 Dokumente',x.key)}</div></div>`;}
 function p04HistoryPanel(){const history=p04.history(state()).slice().reverse().slice(0,80);return history.length?history.map(x=>`<div class="p04-list-row"><div><b>${safe(x.title||'Buchung')} · ${safe(({consumption:'Verbrauch',correction:'Korrektur',transfer:'Umlagerung'})[x.type]||x.type)}</b><small>${safe(new Date(x.at).toLocaleString('de-AT'))} · ${safe(x.scope||x.scopeFrom||'Privat')}${x.sessionId?' · Reinigung '+safe(x.sessionId):''} · ${x.type==='consumption'?(p04Fmt(x.remaining)+' '+safe(x.unit)):(x.type==='transfer'?p04Fmt(x.qty)+' '+safe(x.unit):p04Fmt(x.beforeQty)+' → '+p04Fmt(x.afterQty))}</small></div>${x.type==='consumption'&&x.status!=='undone'?`<div class="p04-actions">${button('p04-correct','✎ Korrigieren',x.id)}${button('p04-undo','↶ Rückgängig',x.id)}</div>`:''}</div>`).join(''):hint('Noch keine Materialbuchungen. Verbrauch wird erst beim Reinigungsabschluss erzeugt.');}
-async function p04ChangeAll(mutator){saveGuard();const oldHouse=structuredClone(state()),oldStock=structuredClone(db.stock),oldLager=structuredClone(db.lager2||{});
+async function p04ChangeAll(mutator){saveGuard();const oldHouse=structuredClone(state()),oldStock=structuredClone(db.stock),oldLager=structuredClone(db.lager2||{}),oldFinance=structuredClone(db.personal?.finance||null);
  try{mutator(state());if(!await save())throw Error('Speichern fehlgeschlagen');refresh();return true}
- catch(err){db.personal.household=oldHouse;db.stock=oldStock;db.lager2=oldLager;refresh();alert('Änderung rückgängig gemacht: '+String(err.message||err));return false;}}
+ catch(err){db.personal.household=oldHouse;db.stock=oldStock;db.lager2=oldLager;if(oldFinance)db.personal.finance=oldFinance;else delete db.personal.finance;refresh();alert('Änderung rückgängig gemacht: '+String(err.message||err));return false;}}
 function p04UpdateSessionCost(h,sessionId){const sess=h.sessions.find(x=>x.id===sessionId);if(!sess)return;const values=(sess.p04Consumptions||[]).map(m=>{const tx=p04.history(h).find(x=>x.id===m.txId);return{...m,qty:tx?.remaining??m.qty,cost:tx?.cost??m.cost}});sess.p04Consumptions=values;sess.materialCost=Math.round(values.reduce((sum,m)=>sum+(m.cost||0),0)*100)/100;sess.roomMaterialCost=p04.roomCosts(sess);}
 async function p04Finish(){const session=state().active;if(!session)return;const outcome=document.getElementById('p03-outcome')?.value||session.outcome||'',outcomeNote=document.getElementById('p03-outcome-note')?.value||'';
  let planned;try{planned=p04.plan(db,state(),session.materials||[]);}catch(e){alert('Material prüfen: '+e.message);return;}
@@ -519,6 +520,8 @@ const p05OldReports=reportsPanel;
 reportsPanel=function(){const sessions=state().sessions,open=sessions.flatMap(s=>p05.defects(s).filter(d=>d.status!=='resolved').map(d=>({...d,sessionId:s.id})));return p05OldReports()+`<section class="p05-section"><h3>✅ Nacharbeitskontrolle – ${open.length} offene Mängel</h3>${open.map(d=>`<div class="p05-item"><b>${safe(placeName(d.roomId))}</b> · ${safe(d.description)} ${button('session-detail','Bericht öffnen',d.sessionId)}</div>`).join('')||hint('Keine offenen Mängel in abgeschlossenen Reinigungen.')}</section>`;};
 document.addEventListener('change',e=>{const v=e.target;if(v.matches('[data-p05-surface]')){change(h=>{if(!h.active)throw Error('Keine laufende Reinigung');h.active.p05SurfaceByRoom||={};if(v.value&&!p05.guidance[v.value])throw Error('Unbekannte Oberfläche');h.active.p05SurfaceByRoom[h.active.roomId]=v.value;});return;}if(!v.matches('[data-p05-check]'))return;const sessionId=v.dataset.p05Session||'',key=v.dataset.p05Check,checked=v.checked;change(h=>{const target=sessionId?h.sessions.find(x=>x.id===sessionId):h.active;if(!target)throw Error('Reinigung nicht gefunden.');p05.setCheck(target,key,checked)}).then(ok=>{if(sessionId&&ok){document.querySelectorAll('body > .mrp-layer').forEach(layer=>{if(layer.querySelector('[data-detail-close]'))layer.remove();});detailsSession(sessionId);}});},true);
 
+/* P06 – joined Putzlager, backed by the existing main stock and private household. */
+globalThis.MRP06Bridge={get db(){return db},state,refresh,saveAll:p04ChangeAll,setTab(name){tab=name;goPrivate('mrp-household');refresh()}};
 /* WK-01 bis WK-05: Wohnungskarte, neue Darstellung und gespeicherter Raumzustand. */
 if(globalThis.MRRoomMap?.install){globalThis.MRRoomMap.install({state,change,getOverview:()=>overview,setOverview:fn=>{overview=fn},getMap:()=>mr91Map,setMap:fn=>{mr91Map=fn},setTab:name=>{tab=name;refresh()}})}
 function init(){booted=true;state();bind();render();const preferred=settings.mrpMode||'business';chooseMode(preferred,false);}
