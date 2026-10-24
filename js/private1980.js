@@ -2,7 +2,7 @@
    Do not import commercial objects automatically; old backup and PDF paths stay intact. */
 (function(){
 'use strict';
-const VERSION='1.9.9.2';
+const VERSION='1.9.9.9';
 const types=['Objekt','Stockwerk / Bereich','Raum','Zone','Schrank','Lagerplatz'];
 const tabs=[['overview','Übersicht'],['places','Objekte & Räume'],['tasks','Putzpläne'],['clean','Reinigung'],['supplies','Material'],['devices','Geräte'],['reports','Statistik']];
 let tab='overview',editor=null,mode='business',booted=false;
@@ -24,7 +24,7 @@ function sumMs(session){return n(session?.baseMs)+Math.max(0,session?.runningSin
 function duration(ms){const min=Math.floor(Math.max(0,ms)/60000);return `${Math.floor(min/60)} h ${String(min%60).padStart(2,'0')} min`}
 function elapsed(ms){const s=Math.floor(Math.max(0,ms)/1000);return `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor(s%3600/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
 function nextDate(start,schedule){if(!start)return dateNow();const dt=new Date(start+'T12:00:00');if(isNaN(dt.getTime()))return dateNow();const step=Math.max(1,Math.min(999,Number(schedule?.count)||1));if(schedule?.unit==='months'){const day=dt.getDate();dt.setDate(1);dt.setMonth(dt.getMonth()+step);const max=new Date(dt.getFullYear(),dt.getMonth()+1,0).getDate();dt.setDate(Math.min(day,max))}else dt.setDate(dt.getDate()+step*(schedule?.unit==='weeks'?7:1));return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`}
-function due(t){if(t.schedule?.unit==='once')return t.completedAt?'':(t.startDate||t.createdAt?.slice(0,10)||dateNow());return t.completedAt?nextDate(t.completedDate||t.completedAt.slice(0,10),t.schedule):t.startDate||t.createdAt?.slice(0,10)||dateNow()}
+function due(t){if(t.nextDueOverride)return t.nextDueOverride;if(t.schedule?.unit==='once')return t.completedAt?'':(t.startDate||t.createdAt?.slice(0,10)||dateNow());return t.completedAt?nextDate(t.completedDate||t.completedAt.slice(0,10),t.schedule):t.startDate||t.createdAt?.slice(0,10)||dateNow()}
 function pending(t){const d=due(t);return d&&d<=dateNow()}
 function uniqPlaceIds(ids){return [...new Set(ids.filter(pid=>!!place(pid)))]}
 function descendants(parentId){let curr=state().places.filter(p=>p.parentId===parentId).map(p=>p.id);const set=new Set(curr);while(curr.length){curr=state().places.filter(p=>curr.includes(p.parentId)&&!set.has(p.id)).map(p=>p.id);curr.forEach(v=>set.add(v))}return set}
@@ -93,7 +93,7 @@ ${h.devices.length?`<div class="mrp-panel">${h.devices.map(d=>{const next=d.last
 function roomMsTotal(s,roomId){return n(s.roomMs?.[roomId])+(s.runningSince&&s.roomId===roomId?Date.now()-s.runningSince:0)}
 function cleanPanel(){const h=state(),s=h.active;
  if(!s)return `<div class="mrp-panel"><h2>⏱ Neue Reinigung</h2><p>Reinige einen Raum oder mehrere Räume gemeinsam. Die Zeiterfassung bleibt beim Wechsel zwischen Räumen getrennt nachvollziehbar.</p>${button('new-session','＋ Reinigung starten','','primary')}</div><div class="mrp-panel"><h2>Letzte abgeschlossene Reinigungen</h2>${h.sessions.length?h.sessions.slice().reverse().slice(0,8).map(x=>`<div class="mrp-row"><div class="mrp-row-main"><b>${safe(formatDate(x.finishedAt?.slice(0,10)))}</b><small>${safe((x.roomIds||[]).map(placeName).join(', '))} · ${duration(x.durationMs)}</small></div>${button('session-detail','Ansehen',x.id)}</div>`).join(''):hint('Noch keine Reinigung dokumentiert.')}</div>`;
- const tasks=h.tasks.filter(t=>s.roomIds.includes(t.placeId)||!t.placeId);const ids=s.completedTaskIds||[];const progress=tasks.length?Math.round(ids.length/tasks.length*100):0;const mats=Array.isArray(s.materials)?s.materials:[];
+ const tasks=h.tasks.filter(t=>s.roomIds.includes(t.placeId)||s.roomIds.some(pid=>descendants(pid).has(t.placeId))||!t.placeId);const ids=s.completedTaskIds||[];const progress=tasks.length?Math.round(ids.length/tasks.length*100):0;const mats=Array.isArray(s.materials)?s.materials:[];
  return `<div class="mrp-panel"><h2>${s.runningSince?'🟢 Reinigung läuft':'⏸ Reinigung pausiert'}</h2><div id="mrp-clock" class="mrp-timer">${elapsed(sumMs(s))}</div><p>Begonnen am ${safe(new Date(s.startedAt).toLocaleString('de-AT'))}</p><div class="mrp-field"><label for="mrp-room-select">Aktuell bearbeiteter Raum</label><select id="mrp-room-select" ${s.runningSince?'':' '}>${s.roomIds.map(x=>`<option value="${safe(x)}" ${x===s.roomId?'selected':''}>${safe(pathName(x))}</option>`).join('')}</select></div>
  <div class="mrp-grid-actions">${s.runningSince?button('pause-session','⏸ Pause'):button('resume-session','▶ Fortsetzen','','primary')}${button('finish-session','✓ Abschließen','','primary')}${button('discard-session','✕ Verwerfen','','danger')}</div>
  <h3>Arbeitszeit je Raum</h3>${s.roomIds.map(x=>`<div class="mrp-row"><span>${safe(placeName(x))}</span><b class="mrp-room-time" data-room="${safe(x)}">${duration(roomMsTotal(s,x))}</b></div>`).join('')}</div>
@@ -124,8 +124,16 @@ function editorOpen(kind,item=null,override=null){const h=state(),obj=item||{},e
  document.getElementById('mrp-modal-title').textContent=title;document.getElementById('mrp-form-fields').innerHTML=fields;document.getElementById('mrp-layer').hidden=false;document.getElementById('mrp-layer').setAttribute('aria-hidden','false');document.getElementById('mrp-form').querySelector('[type=submit]').disabled=kind==='session'&&!h.places.length;document.getElementById('mrp-form').querySelector('input,select,textarea')?.focus();}
 function editorClose(){editor=null;document.getElementById('mrp-layer').hidden=true;document.getElementById('mrp-layer').setAttribute('aria-hidden','true');}
 async function editorSubmit(e){e.preventDefault();if(!editor)return;const {kind,id:objid}=editor,h=state(),fd=new FormData(e.currentTarget),get=k=>String(fd.get(k)||'').trim(),q=k=>n(fd.get(k));const obj={id:objid||id()};
- if(kind==='place'){obj.name=get('title');obj.type=get('kind');obj.parentId=get('parentId')||'';if(!obj.name){alert('Bezeichnung fehlt.');return}if(obj.parentId===obj.id||descendants(obj.id).has(obj.parentId)){alert('Ein Bereich darf nicht unter sich selbst oder einem Unterbereich liegen.');return}}
- if(kind==='task'){obj.title=get('title');obj.placeId=get('placeId');obj.startDate=get('startDate');obj.priority=get('priority');obj.note=get('note');obj.schedule={unit:get('unit'),count:Math.max(1,q('count'))};obj.materials=h.supplies.map(s=>({id:s.id,qty:q('supply_'+s.id)})).filter(x=>x.qty>0);if(!obj.title||!obj.placeId){alert('Aufgabe und Raum auswählen.');return}}
+ if(kind==='place'){obj.name=get('title');obj.type=get('kind');obj.parentId=get('parentId')||'';if(!obj.name){alert('Bezeichnung fehlt.');return}if(obj.parentId===obj.id||descendants(obj.id).has(obj.parentId)){alert('Ein Bereich darf nicht unter sich selbst oder einem Unterbereich liegen.');return}
+  const prior=h.places.find(p=>p.id===obj.id)||{};const priorProfile=prior.profile||{};
+  obj.profile={...priorProfile,area:q('p01Area'),floor:get('p01Floor'),surfaces:get('p01Surfaces'),features:get('p01Features'),notes:get('p01Notes')};
+  const removed=new Set(fd.getAll('p01RemovePhoto').map(String));const retained=(Array.isArray(priorProfile.photos)?priorProfile.photos:[]).filter((_,i)=>!removed.has(String(i)));
+  const photoFiles=fd.getAll('p01Photos').filter(f=>f instanceof File&&f.size>0);
+  if(retained.length+photoFiles.length>12){alert('Maximal 12 Fotos je Raum.');return}
+  try{for(const f of photoFiles){if(!f.type.startsWith('image/')||f.size>12*1024*1024)throw Error('Nur Bilder bis 12 MB möglich.');retained.push(await imageData(f))}}catch(err){alert('Raumfoto: '+err.message);return}
+  obj.profile.photos=retained;obj.templateCode=get('p01Template');
+ }
+ if(kind==='task'){obj.title=get('title');obj.placeId=get('placeId');obj.startDate=get('startDate');obj.priority=get('priority');obj.note=get('note');obj.schedule={unit:get('unit'),count:Math.max(1,q('count'))};obj.materials=h.supplies.map(s=>({id:s.id,qty:q('supply_'+s.id)})).filter(x=>x.qty>0);const priorTask=h.tasks.find(t=>t.id===objid);if(priorTask?.completedAt&&priorTask.startDate!==obj.startDate)obj.nextDueOverride=obj.startDate;if(!obj.title||!obj.placeId){alert('Aufgabe und Raum auswählen.');return}}
  if(kind==='supply'){obj.title=get('title');obj.unit=get('unit');obj.qty=q('qty');obj.min=q('min');obj.price=q('price');obj.note=get('note');obj.category=get('category');obj.placeId=get('placeId');if(!obj.title){alert('Name fehlt.');return}const newPhoto=fd.get('photo');if(newPhoto&&newPhoto.size){if(newPhoto.size>18*1024*1024){alert('Maximal 18 MB je Foto.');return}try{obj.image=await imageData(newPhoto)}catch(ex){alert('Foto: '+ex.message);return}}else if(fd.get('removePhoto'))obj.image='';} 
  if(kind==='device'){obj.title=get('title');obj.brand=get('brand');obj.model=get('model');obj.placeId=get('placeId');obj.purchased=get('purchased');obj.warranty=get('warranty');obj.interval=q('interval');obj.lastService=get('lastService');obj.note=get('note');if(!obj.title){alert('Gerätename fehlt.');return}}
  if(kind==='service'){obj.date=get('date');obj.type=get('type');obj.cost=q('cost');obj.note=get('note');if(!obj.date){alert('Datum fehlt.');return}}
@@ -133,14 +141,16 @@ async function editorSubmit(e){e.preventDefault();if(!editor)return;const {kind,
  let ok=false;
  if(kind==='session'){if(h.active){alert('Bitte laufende Reinigung zuerst abschließen oder verwerfen.');return}ok=await change(h=>{h.active={id:obj.id,roomIds:obj.roomIds,roomId:obj.roomIds[0],baseMs:0,roomMs:{},runningSince:Date.now(),startedAt:new Date().toISOString(),completedTaskIds:[],materials:[],beforePhotos:[],afterPhotos:[],note:obj.note}})}
  else if(kind==='service'){ok=await change(h=>{const d=h.devices.find(x=>x.id===objid);if(!d)throw Error('Gerät nicht gefunden');d.history ||= [];d.history.push({...obj,id:id()});d.lastService=obj.date})}
- else{ok=await change(h=>{const k=({place:'places',task:'tasks',supply:'supplies',device:'devices'})[kind],arr=h[k];const i=arr.findIndex(x=>x.id===obj.id);if(i>=0){const old=arr[i];arr[i]={...old,...obj};}else arr.push(obj)})}
+ else{ok=await change(h=>{const k=({place:'places',task:'tasks',supply:'supplies',device:'devices'})[kind],arr=h[k];const i=arr.findIndex(x=>x.id===obj.id);if(i>=0){const old=arr[i];arr[i]={...old,...obj};}else arr.push(obj);
+   if(kind==='place'&&obj.type==='Raum'&&obj.templateCode)p01ApplyTemplate(h,obj.id,obj.templateCode);
+  })}
  if(ok){editorClose();if(kind==='session'){tab='clean';goPrivate('mrp-household')}else refresh()}
 }
 function noteSession(roomId){const s=state().active;if(!s||!s.runningSince)return;const ms=Math.max(0,Date.now()-s.runningSince);s.baseMs=n(s.baseMs)+ms;s.roomMs ||= {};s.roomMs[s.roomId]=n(s.roomMs[s.roomId])+ms;s.runningSince=null;}
 function recalcMaterials(h){const s=h.active;if(!s)return;const suggested=new Map();for(const tid of s.completedTaskIds){const t=h.tasks.find(x=>x.id===tid);if(t)for(const m of t.materials||[])suggested.set(m.id,n(suggested.get(m.id))+n(m.qty))}s.materials=[...suggested].map(([id,qty])=>({id,qty}))}
 async function completeSession(){const h=state(),s=h.active;if(!s)return;const proposed=(s.materials||[]).filter(m=>n(m.qty)>0);const invalid=proposed.find(m=>{const x=h.supplies.find(z=>z.id===m.id);return !x||n(m.qty)>n(x.qty)+0.000001});if(invalid){const x=h.supplies.find(v=>v.id===invalid.id);alert('Nicht genug Material: '+(x?.title||'Artikel')+'. Menge korrigieren oder Vorrat aktualisieren.');return}
  const ok=confirm(`Reinigung abschließen?\n${s.completedTaskIds.length} Aufgaben erledigt.\n${proposed.length} Materialpositionen abbuchen.\nDas setzt die jeweiligen Reinigungsintervalle neu.`);if(!ok)return;
- await change(h=>{const act=h.active;noteSession();const now=new Date().toISOString();let materialCost=0;for(const m of proposed){const z=h.supplies.find(x=>x.id===m.id);const qty=n(m.qty);z.qty=Math.max(0,Math.round((n(z.qty)-qty)*10000)/10000);materialCost+=qty*n(z.price)}for(const tid of act.completedTaskIds){const t=h.tasks.find(x=>x.id===tid);if(t){t.completedAt=now;t.completedDate=dateNow();t.completions||=[];t.completions.push({sessionId:act.id,at:now})}}h.sessions.push({...act,finishedAt:now,durationMs:n(act.baseMs),materialCost:Math.round(materialCost*100)/100,materials:proposed.map(m=>({...m,title:h.supplies.find(z=>z.id===m.id)?.title||''})),runningSince:null});h.active=null});
+ await change(h=>{const act=h.active;noteSession();const now=new Date().toISOString();let materialCost=0;for(const m of proposed){const z=h.supplies.find(x=>x.id===m.id);const qty=n(m.qty);z.qty=Math.max(0,Math.round((n(z.qty)-qty)*10000)/10000);materialCost+=qty*n(z.price)}for(const tid of act.completedTaskIds){const t=h.tasks.find(x=>x.id===tid);if(t){t.completedAt=now;t.completedDate=dateNow();t.nextDueOverride='';t.completions||=[];t.completions.push({sessionId:act.id,at:now})}}h.sessions.push({...act,finishedAt:now,durationMs:n(act.baseMs),materialCost:Math.round(materialCost*100)/100,materials:proposed.map(m=>({...m,title:h.supplies.find(z=>z.id===m.id)?.title||''})),runningSince:null});h.active=null});
 }
 function detailsSession(objid){const s=find('sessions',objid);if(!s)return;const w=document.createElement('div');w.className='mrp-layer';w.innerHTML=`<div class="mrp-modal" role="dialog" aria-modal="true"><div class="mrp-modal-header"><h2>Reinigungsbericht</h2><button class="mrp-btn" data-detail-close="1">✕</button></div><p>Datum: ${safe(new Date(s.finishedAt).toLocaleString('de-AT'))} · Dauer: ${duration(s.durationMs)}</p><h3>Räume & Zeiten</h3>${(s.roomIds||[]).map(pid=>`<div class="mrp-row"><b>${safe(pathName(pid))}</b><span>${duration(s.roomMs?.[pid]||0)}</span></div>`).join('')}<h3>Checkliste</h3>${(s.completedTaskIds||[]).map(tid=>`<div class="mrp-row"><span>${safe(state().tasks.find(t=>t.id===tid)?.title||'Gelöschte Aufgabe')}</span>✓</div>`).join('')||'–'}<h3>Verbrauch · ${money(s.materialCost)}</h3>${(s.materials||[]).map(m=>`<div class="mrp-row">${safe(m.title)}: ${n(m.qty)} ${safe(state().supplies.find(x=>x.id===m.id)?.unit||'')}</div>`).join('')||'–'}<p>${safe(s.note||'')}</p><h3>Vorher</h3>${photoThumbs(s.beforePhotos)}<h3>Nachher</h3>${photoThumbs(s.afterPhotos)}</div>`;document.body.appendChild(w);w.addEventListener('click',e=>{if(e.target===w||e.target.closest('[data-detail-close]'))w.remove()});}
 async function action(name,objid){const h=state();switch(name){
@@ -212,7 +222,7 @@ householdShell=function(){const h=state(),dueCount=dueTasks().length;return '<di
 const mr91PrevPlaces=placesPanel;
 function mr91RoomList(){const h=state();return h.places.filter(p=>['Raum','Zone'].includes(p.type));}
 function mr91Map(){const h=state(),floor=h.floorplan||[];
- const paths=floor.map((item,i)=>{const coords=(item.points||[]).map(p=>p.join(',')).join(' ');if(!coords)return '';const palette=['#41e2ba','#91a5ff','#f9afce','#f0cb78'];return `<g><polygon points="${coords}" fill="${palette[i%4]}30" stroke="${palette[i%4]}" stroke-width="4"/><title>${safe(placeName(item.roomId))}</title></g>`}).join('');
+ const paths=floor.map((item,i)=>{const coords=(item.points||[]).map(p=>p.join(',')).join(' ');if(!coords)return '';const palette=['#41e2ba','#91a5ff','#f9afce','#f0cb78'];return `<g data-p01-room="${safe(item.roomId)}" role="button" tabindex="0" aria-label="Raum ${safe(placeName(item.roomId))} öffnen"><polygon points="${coords}" fill="${palette[i%4]}30" stroke="${palette[i%4]}" stroke-width="4"/><title>${safe(placeName(item.roomId))}</title>${p01PlanLabel(item)}</g>`}).join('');
  return `<section class="mr91-plan"><div class="mr91-heading"><h3>✏️ Wohnung mit dem Finger zeichnen</h3><p>Raum unten auswählen, einen geschlossenen Umriss mit Finger oder Maus zeichnen und speichern. Jeder gezeichnete Bereich wird dem Raum zugeordnet.</p></div><label for="mr91-plan-room">Raum auswählen</label><select id="mr91-plan-room">${mr91RoomList().map(r=>`<option value="${safe(r.id)}" ${r.id===mr91FocusRoom?'selected':''}>${safe(r.name)}</option>`).join('')}</select><svg id="mr91-plan-svg" viewBox="0 0 1000 700" preserveAspectRatio="none" aria-label="Zeichenfläche: Raumumrisse freihändig zeichnen"><defs><pattern id="mr91-grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="#39585d" stroke-width="1"/></pattern></defs><rect width="1000" height="700" fill="url(#mr91-grid)"/>${paths}<polyline id="mr91-drawing" points="" stroke="#faffef" stroke-width="5" fill="#9fffe824" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="mr91-buttons"><button type="button" data-mr91-plan="undo">↶ Letzten Raum entfernen</button><button type="button" data-mr91-plan="clear">Zeichnung löschen</button></div><p class="mr91-map-help">${floor.length} gespeicherte Umrisse · Maßstab frei (kein technischer Bauplan). Für Wände möglichst eine geschlossene Linie zeichnen.</p></section>`}
 placesPanel=function(){const h=state(),rooms=mr91RoomList();if(!mr91FocusRoom||!rooms.some(p=>p.id===mr91FocusRoom))mr91FocusRoom=rooms[0]?.id||'';
  const focus=rooms.find(p=>p.id===mr91FocusRoom);const tasks=h.tasks.filter(t=>t.placeId===mr91FocusRoom);return `<section class="mr91-room-head"><div><h2>🏠 Räume & Wohnungsplan</h2><p>Raumverwaltung, Putzaufgaben und handgezeichneter Grundriss an einem Ort.</p></div>${button('new-place','＋ Raum / Bereich anlegen','','primary')}</section><div class="mr91-rooms">${rooms.map(p=>{const arr=h.tasks.filter(t=>t.placeId===p.id);return `<button type="button" data-mr91-room="${safe(p.id)}" class="${p.id===mr91FocusRoom?'active':''}"><span>🚪</span><strong>${safe(p.name)}</strong><small>${arr.length} Aufgaben · ${arr.filter(pending).length} fällig</small></button>`}).join('')||hint('Lege zuerst einen Raum an, um Aufgaben und Zeichnungen anzulegen.')}</div>${focus?`<div class="mrp-panel"><div class="mrp-section-head"><h3>☑ Aufgaben: ${safe(focus.name)}</h3>${button('room-new-task','＋ Aufgabe',focus.id,'primary')}</div>${tasks.length?tasks.map(t=>`<div class="mrp-row"><div class="mrp-row-main"><b>${safe(t.title)}</b><small>${safe(t.priority||'Normal')} · ${pending(t)?'Fällig':'Nächste: '+formatDate(due(t))}</small></div>${button('edit-task','Bearbeiten',t.id)}</div>`).join(''):hint('Für diesen Raum gibt es noch keine Aufgaben. Lege eine einmalige oder wiederkehrende Aufgabe an.')}
@@ -237,11 +247,78 @@ document.addEventListener('click',e=>{const f=e.target.closest('[data-mr87-filte
 document.addEventListener('click',e=>{const b=e.target.closest('[data-mr91-room]');if(b){mr91FocusRoom=b.dataset.mr91Room;refresh();return;}const a=e.target.closest('[data-mr91-plan]');if(!a)return;const value=a.dataset.mr91Plan;if(value==='clear'&&!confirm('Alle gezeichneten Umrisse entfernen? Räume und Aufgaben bleiben erhalten.'))return;change(h=>{h.floorplan ||= [];if(value==='undo')h.floorplan.pop();else if(value==='clear')h.floorplan=[];}).catch(console.error);},true);
 document.addEventListener('change',e=>{if(e.target.id==='mr91-plan-room')mr91FocusRoom=e.target.value},true);
 function mr91Coord(svg,ev){const r=svg.getBoundingClientRect();return [Math.min(1000,Math.max(0,Math.round((ev.clientX-r.left)/r.width*1000))),Math.min(700,Math.max(0,Math.round((ev.clientY-r.top)/r.height*700)))]}
-document.addEventListener('pointerdown',e=>{const svg=e.target.closest?.('#mr91-plan-svg');if(!svg||!mr91FocusRoom||mr91Pointer!==null)return;e.preventDefault();mr91Pointer=e.pointerId;mr91Stroke=[mr91Coord(svg,e)];svg.setPointerCapture(e.pointerId);},true);
+document.addEventListener('pointerdown',e=>{const svg=e.target.closest?.('#mr91-plan-svg');if(!svg||e.target.closest('[data-p01-room]')||!mr91FocusRoom||mr91Pointer!==null)return;e.preventDefault();mr91Pointer=e.pointerId;mr91Stroke=[mr91Coord(svg,e)];svg.setPointerCapture(e.pointerId);},true);
 document.addEventListener('pointermove',e=>{if(e.pointerId!==mr91Pointer||!mr91Stroke)return;const svg=document.getElementById('mr91-plan-svg');if(!svg)return;const point=mr91Coord(svg,e),last=mr91Stroke.at(-1);if(Math.hypot(point[0]-last[0],point[1]-last[1])>=8){mr91Stroke.push(point);const node=document.getElementById('mr91-drawing');if(node)node.setAttribute('points',mr91Stroke.map(p=>p.join(',')).join(' '));}},true);
 document.addEventListener('pointerup',async e=>{if(e.pointerId!==mr91Pointer)return;const stroke=mr91Stroke;mr91Pointer=null;mr91Stroke=null;const node=document.getElementById('mr91-drawing');if(node)node.setAttribute('points','');if(!stroke||stroke.length<8||!mr91FocusRoom)return;const name=mr91FocusRoom;await change(h=>{h.floorplan ||= [];h.floorplan.push({id:id(),roomId:name,points:stroke.slice(0,500)});});},true);
 document.addEventListener('pointercancel',e=>{if(e.pointerId===mr91Pointer){mr91Stroke=null;mr91Pointer=null;const el=document.getElementById('mr91-drawing');if(el)el.setAttribute('points','')}},true);
 document.addEventListener('input',e=>{if(e.target.id==='mr87-search'){mr87Search=e.target.value;const list=document.querySelector('.mrc-results');if(list)list.innerHTML=mr87Rows()}},true);
+
+
+/* P01 – Professionelle Raum- und Zonenverwaltung. Erweiterung ohne Datenmigration.
+   Vorhandene places-IDs, Aufgaben, Sitzungen und floorplan-Punkte bleiben unverändert. */
+const p01Templates={
+ kitchen:{label:'Küche',zones:[['Arbeitsflächen','Arbeitsflächen reinigen'],['Spüle','Spüle reinigen'],['Herd','Kochfeld reinigen'],['Boden','Boden reinigen'],['Schränke','Schrankfronten reinigen']]},
+ bath:{label:'Badezimmer',zones:[['Dusche','Dusche reinigen'],['Waschbecken','Waschbecken reinigen'],['Spiegel','Spiegel reinigen'],['Fliesen','Fliesen reinigen'],['Boden','Boden reinigen']]},
+ wc:{label:'WC',zones:[['Toilette','WC reinigen'],['Waschbecken','Handwaschbecken reinigen'],['Spiegel','Spiegel reinigen'],['Boden','Boden reinigen']]},
+ living:{label:'Wohnzimmer',zones:[['Wohnbereich','Oberflächen abstauben'],['Sitzmöbel','Sitzmöbel reinigen'],['Fenster','Fenster reinigen'],['Boden','Boden reinigen']]},
+ bedroom:{label:'Schlafzimmer',zones:[['Bett','Bettwäsche wechseln'],['Möbel','Staub wischen'],['Kleiderschrank','Schrankfronten reinigen'],['Boden','Boden reinigen']]},
+ hall:{label:'Flur / Eingangsbereich',zones:[['Eingang','Eingang reinigen'],['Garderobe','Garderobe reinigen'],['Boden','Boden reinigen']]},
+ office:{label:'Arbeitszimmer',zones:[['Schreibtisch','Schreibtisch reinigen'],['Regale','Regale abstauben'],['Boden','Boden reinigen']]}
+};
+function p01ApplyTemplate(h,roomId,templateCode){const template=p01Templates[templateCode];if(!template)return;
+ for(const [zname,tname] of template.zones){let zone=h.places.find(p=>p.parentId===roomId&&p.type==='Zone'&&p.name.trim().toLowerCase()===zname.toLowerCase());
+ if(!zone){zone={id:id(),type:'Zone',name:zname,parentId:roomId};h.places.push(zone)}
+ if(!h.tasks.some(t=>t.placeId===zone.id&&t.title.trim().toLowerCase()===tname.toLowerCase()))h.tasks.push({id:id(),title:tname,placeId:zone.id,startDate:dateNow(),priority:'Normal',schedule:{unit:'weeks',count:1},materials:[],note:'Raumvorlage: '+template.label,createdAt:new Date().toISOString()});
+ }
+}
+function p01RoomZones(roomId){return state().places.filter(p=>p.parentId===roomId&&p.type==='Zone')}
+function p01RoomTasks(roomId){const sub=descendants(roomId);return state().tasks.filter(t=>t.placeId===roomId||sub.has(t.placeId))}
+function p01Status(roomId){const tasks=p01RoomTasks(roomId),today=dateNow(),near=nextDate(today,{unit:'days',count:2});
+ if(!tasks.length)return {label:'Kein Putzplan',kind:'neutral'};
+ const dueDates=tasks.map(t=>due(t)).filter(Boolean);
+ if(dueDates.some(d=>d<today))return {label:'Überfällig',kind:'late'};
+ if(dueDates.some(d=>d<=near))return {label:'Bald fällig',kind:'soon'};
+ return tasks.every(t=>t.completedAt)?{label:'Erledigt',kind:'done'}:{label:'Geplant',kind:'neutral'};
+}
+function p01PlanLabel(item){const pts=item.points||[];if(!pts.length)return '';const avg=(key)=>Math.round(pts.reduce((acc,p)=>acc+(Number(p[key])||0),0)/pts.length),x=avg(0),y=avg(1),st=p01Status(item.roomId);
+ return `<text x="${x}" y="${y}" class="p01-map-label" text-anchor="middle">${safe(placeName(item.roomId))}</text><text x="${x}" y="${y+21}" class="p01-map-state ${st.kind}" text-anchor="middle">${safe(st.label)}</text>`;
+}
+function p01RoomCard(p){const prof=p.profile||{},zones=p01RoomZones(p.id),tasks=p01RoomTasks(p.id),st=p01Status(p.id);
+ return `<article class="p01-room ${p.id===mr91FocusRoom?'selected':''}">
+  <button class="p01-room-open" type="button" data-p01-select="${safe(p.id)}"><span class="p01-room-icon">🏠</span><span><strong>${safe(p.name)}</strong><small>${safe(pathName(p.id))}</small></span><span class="p01-status ${st.kind}">${safe(st.label)}</span></button>
+  ${p.id===mr91FocusRoom?`<div class="p01-room-body"><div class="p01-room-metrics"><span>📐 ${n(prof.area)?n(prof.area).toLocaleString('de-AT')+' m²':'Fläche offen'}</span><span>▦ ${safe(prof.floor||'Bodenbelag offen')}</span><span>☑ ${tasks.length} Aufgaben</span></div>
+   ${prof.surfaces?`<p><b>Oberflächen:</b> ${safe(prof.surfaces)}</p>`:''}${prof.features?`<p><b>Besonderheiten:</b> ${safe(prof.features)}</p>`:''}${prof.notes?`<p><b>Hinweise:</b> ${safe(prof.notes)}</p>`:''}
+   ${(prof.photos||[]).length?`<div class="p01-photos">${prof.photos.map(src=>`<img src="${safe(src)}" data-p01-zoom="1" loading="lazy" alt="Raumfoto"/>`).join('')}</div>`:''}
+   <div class="p01-actions">${button('edit-place','✎ Profil bearbeiten',p.id)}${button('p01-add-zone','＋ Zone',p.id,'primary')}${button('room-new-task','＋ Aufgabe',p.id)}${button('new-session','▶ Reinigen',p.id)}</div>
+   <h4>Reinigungszonen</h4>${zones.length?zones.map(z=>`<div class="p01-zone"><span>▧ <b>${safe(z.name)}</b><small> ${p01RoomTasks(z.id).length} Aufgaben</small></span><span>${button('edit-place','✎',z.id)}${button('delete-place','✕',z.id,'danger')}</span></div>`).join(''):hint('Noch keine Zonen. „＋ Zone“ verwenden oder eine Raumvorlage beim Bearbeiten ergänzen.')}
+   <h4>Reinigungsaufgaben</h4>${tasks.map(t=>`<div class="p01-zone"><span>☑ ${safe(t.title)}<small>${safe(pathName(t.placeId))} · ${due(t)?formatDate(due(t)):'Erledigt'}</small></span>${button('edit-task','✎',t.id)}</div>`).join('')||hint('Noch kein Putzplan angelegt.')}
+   </div>`:''}
+ </article>`;
+}
+placesPanel=function(){const h=state(),rooms=h.places.filter(p=>p.type==='Raum');if(!rooms.some(p=>p.id===mr91FocusRoom))mr91FocusRoom=rooms[0]?.id||'';
+ return `<div class="p01-heading"><div><h2>🏠 Räume & Zonen</h2><p>Raumprofile, wiederverwendbare Vorlagen, Fälligkeit und Finger-Wohnungsplan. Bestehende Daten bleiben erhalten.</p></div>${button('new-place','＋ Objekt / Raum','','primary')}</div>
+ ${rooms.length?`<div class="p01-list">${rooms.map(p01RoomCard).join('')}</div>`:hint('Noch keine Räume. Unter „Objekt / Raum“ zuerst einen Raum anlegen.')}
+ ${mr91Map()}
+ <details class="mr91-all-places"><summary>Alle Objekte, Stockwerke, Zonen und Lagerplätze (${h.places.length})</summary>${mr91PrevPlaces()}</details>`;
+};
+const p01OldEditorOpen=editorOpen;
+editorOpen=function(kind,item=null,override=null){p01OldEditorOpen(kind,item,override);if(kind!=='place')return;
+ const el=document.getElementById('mrp-form-fields');if(!el)return;
+ if(override&&typeof override==='object'&&override.p01ZoneParent){const typ=el.querySelector('select[name="kind"]'),parent=el.querySelector('select[name="parentId"]');if(typ)typ.value='Zone';if(parent)parent.value=override.p01ZoneParent;}
+ const prof=item?.profile||{},photos=Array.isArray(prof.photos)?prof.photos:[];
+ el.insertAdjacentHTML('beforeend',`<div class="p01-formgroup wide"><h3>🏠 Raumprofil / Zonenprofil</h3><p class="mrp-muted">Optionale Angaben: bestehende Raum- und Zonen-IDs bleiben gleich.</p></div>`+
+ field('Fläche (m²)','p01Area',prof.area??'','number','min="0" step="0.01"')+
+ field('Bodenbelag','p01Floor',prof.floor||'')+
+ textField('Oberflächen / Materialien','p01Surfaces',prof.surfaces||'')+
+ textField('Besonderheiten / empfindliche Stellen','p01Features',prof.features||'')+
+ textField('Eigene Hinweise','p01Notes',prof.notes||'')+
+ `<div class="mrp-field wide"><label for="p01-photos">Raumfotos (max. 12, je 12 MB)</label><input type="file" id="p01-photos" name="p01Photos" accept="image/*" multiple>${photos.length?`<div class="p01-formphotos">${photos.map((src,i)=>`<label><img src="${safe(src)}" alt="Foto ${i+1}"><span><input type="checkbox" name="p01RemovePhoto" value="${i}"> Foto ${i+1} entfernen</span></label>`).join('')}</div>`:''}</div>`+
+ `<div class="mrp-field wide"><label for="p01-template">Raumvorlage / Reinigungszonen und Aufgaben ergänzen</label><select id="p01-template" name="p01Template"><option value="">Keine Vorlage anwenden</option>${Object.entries(p01Templates).map(([code,t])=>`<option value="${code}">${safe(t.label)} – Zonen und wöchentliche Aufgaben hinzufügen</option>`).join('')}</select><small>Vorlagen ergänzen fehlende Zonen und Aufgaben, ersetzen nichts. Bereits vorhandene passende Einträge werden nicht doppelt angelegt.</small></div>`);
+};
+const p01OldAction=action;
+action=async function(name,objid){if(name==='p01-add-zone'){if(!place(objid)||place(objid).type!=='Raum')return;editorOpen('place',null,{p01ZoneParent:objid});return}return p01OldAction(name,objid)};
+document.addEventListener('click',e=>{const p=e.target.closest('[data-p01-room],[data-p01-select]');if(p){e.preventDefault();e.stopImmediatePropagation();const pid=p.dataset.p01Room||p.dataset.p01Select;if(place(pid)){mr91FocusRoom=place(pid).type==='Zone'?place(pid).parentId:pid;tab='places';refresh();document.querySelector('.p01-list')?.scrollIntoView({block:'start',behavior:'smooth'});}return}const photo=e.target.closest('img[data-p01-zoom]');if(photo){const overlay=document.createElement('div');overlay.className='mrp-photo-view';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');const img=new Image();img.src=photo.src;img.alt='Raumfoto groß';const close=document.createElement('button');close.textContent='✕ Schließen';overlay.append(close,img);document.body.append(overlay);overlay.addEventListener('click',ev=>{if(ev.target!==img)overlay.remove()});}},true);
+document.addEventListener('keydown',e=>{const p=e.target.closest('[data-p01-room]');if(p&&(e.key==='Enter'||e.key===' ')){e.preventDefault();p.dispatchEvent(new MouseEvent('click',{bubbles:true}))}},true);
 
 function init(){booted=true;state();bind();render();const preferred=settings.mrpMode||'business';chooseMode(preferred,false);}
 // The existing app loads the IndexedDB asynchronously in verbesserungen1961.js; hook its rendering only after the actual read.

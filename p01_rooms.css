@@ -1,0 +1,21 @@
+/* P01: Raum- und Zonenverwaltung – Premium dunkel/smaragdgrün */
+.p01-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:8px 0 17px}
+.p01-heading h2{margin:0 0 6px;font-size:1.36rem;color:#effcf7}.p01-heading p{max-width:55ch;color:#a8c5bd;font-size:.9rem;margin:0}
+.p01-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,305px),1fr));gap:13px;margin-bottom:22px;align-items:start}
+.p01-room{border:1px solid #355751;background:linear-gradient(145deg,#142e2b,#132623);box-shadow:0 7px 22px #020f0d75;border-radius:17px;min-width:0;overflow:hidden}
+.p01-room.selected{border-color:#45d7af;box-shadow:0 8px 22px #002920a9,0 0 0 1px #269d7b44}
+.p01-room-open{width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:14px;background:none;color:#f5fffb;border:0;cursor:pointer}
+.p01-room-open>span:nth-child(2){flex:1;min-width:0}.p01-room-open strong,.p01-room-open small{display:block;overflow-wrap:anywhere}.p01-room-open strong{font-size:1rem}.p01-room-open small{color:#acc5bf;margin-top:3px;font-size:.76rem}.p01-room-icon{font-size:24px;padding:10px;border-radius:12px;background:#27605360}
+.p01-status{font-size:.67rem;font-weight:700;line-height:1.3;padding:5px 8px;border-radius:20px;white-space:normal;text-align:center;max-width:100px;background:#293b37;color:#d0dad5}
+.p01-status.soon{background:#594526;color:#ffd68c}.p01-status.late{background:#602c2e;color:#ffd1cf}.p01-status.done{background:#174b3e;color:#99efd0}
+.p01-room-body{border-top:1px solid #38534d;padding:14px;color:#e2f6ed}.p01-room-body p{margin:9px 0;overflow-wrap:anywhere;font-size:.87rem}.p01-room-body h4{margin:20px 0 9px;color:#c4ffe7;font-size:.92rem}.p01-room-metrics{display:flex;gap:5px;flex-wrap:wrap}.p01-room-metrics span{border:1px solid #46695e;background:#1a3f34;padding:5px 8px;border-radius:8px;font-size:.77rem}
+.p01-photos{display:flex;gap:7px;overflow-x:auto;padding:9px 0}.p01-photos img{width:88px;height:80px;flex:none;object-fit:cover;border:1px solid #3c7565;border-radius:10px;cursor:zoom-in}
+.p01-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.p01-actions .mrp-btn{font-size:.78rem;padding:8px 9px}
+.p01-zone{display:flex;align-items:center;justify-content:space-between;gap:5px;border-bottom:1px solid #36534b;padding:9px 2px;font-size:.82rem}
+.p01-zone small{display:block;color:#a9c6bc;margin-top:3px}.p01-zone .mrp-btn{margin-left:4px;padding:5px 8px;font-size:.77rem}
+.p01-formgroup{border-top:1px solid #47645b;margin-top:12px;padding-top:10px}.p01-formgroup h3{color:#b8f0dc;margin:5px 0}.p01-formphotos{display:flex;gap:8px;flex-wrap:wrap}.p01-formphotos label{display:grid;gap:4px;font-size:.74rem}.p01-formphotos img{width:77px;height:68px;object-fit:cover;border-radius:7px}
+#mr91-plan-svg [data-p01-room]{cursor:pointer;outline:none}#mr91-plan-svg [data-p01-room]:focus polygon,#mr91-plan-svg [data-p01-room]:hover polygon{stroke:#eeffc9;stroke-width:7}
+#mr91-plan-svg .p01-map-label{font:bold 16px system-ui,sans-serif;fill:#f5fff9;paint-order:stroke;stroke:#092d26;stroke-width:5;pointer-events:none}
+#mr91-plan-svg .p01-map-state{font:bold 12px system-ui,sans-serif;fill:#d6ebe5;paint-order:stroke;stroke:#092d26;stroke-width:5;pointer-events:none}
+#mr91-plan-svg .p01-map-state.late{fill:#ffabac}#mr91-plan-svg .p01-map-state.soon{fill:#ffda8b}#mr91-plan-svg .p01-map-state.done{fill:#89ffc3}
+@media(max-width:500px){.p01-list{grid-template-columns:minmax(0,1fr)}.p01-room-open{padding:11px}.p01-room-body{padding:12px}}
